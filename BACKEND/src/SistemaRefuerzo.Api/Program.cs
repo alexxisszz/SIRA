@@ -14,6 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 const string PoliticaCorsFrontend = "FrontendAngular";
 
+var puerto = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrWhiteSpace(puerto))
+    builder.WebHost.UseUrls($"http://0.0.0.0:{puerto}");
+
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
@@ -53,8 +57,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
 
-    using var scope = app.Services.CreateScope();
+using (var scope = app.Services.CreateScope())
+{
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
     await DbInitializer.SeedAsync(dbContext, passwordHasher);
