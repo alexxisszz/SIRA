@@ -1,0 +1,85 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h4 mb-0">Alumnos</h1>
+  <button type="button" class="btn btn-primary btn-sm" (click)="abrirCrear()">+ Nuevo alumno</button>
+</div>
+
+@if (mostrarFormulario()) {
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h6 mb-3">{{ editando() ? 'Editar alumno' : 'Nuevo alumno' }}</h2>
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="row g-2">
+          <div class="col-12">
+            <label class="form-label small">Correo</label>
+            <input type="email" class="form-control" formControlName="correoElectronico" />
+          </div>
+          @if (!editando()) {
+            <div class="col-12">
+              <label class="form-label small">Contraseña</label>
+              <input type="password" class="form-control" formControlName="contrasena" />
+            </div>
+          }
+          <div class="col-6">
+            <label class="form-label small">Nombres</label>
+            <input type="text" class="form-control" formControlName="nombres" />
+          </div>
+          <div class="col-6">
+            <label class="form-label small">Apellidos</label>
+            <input type="text" class="form-control" formControlName="apellidos" />
+          </div>
+          <div class="col-12">
+            <label class="form-label small">Grado</label>
+            <input type="text" class="form-control" formControlName="grado" />
+          </div>
+        </div>
+
+        @if (error()) {
+          <div class="alert alert-danger py-2 mt-3">{{ error() }}</div>
+        }
+
+        <div class="d-flex gap-2 mt-3">
+          <button type="submit" class="btn btn-primary btn-sm" [disabled]="formulario.invalid">Guardar</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelar()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (cargando()) {
+  <p class="text-muted">Cargando alumnos...</p>
+} @else {
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th>Alumno</th>
+        <th>Correo</th>
+        <th>Grado</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (alumno of alumnos(); track alumno.alumnoId) {
+        <tr>
+          <td>{{ alumno.apellidos }}, {{ alumno.nombres }}</td>
+          <td>{{ alumno.correoElectronico }}</td>
+          <td>{{ alumno.grado }}</td>
+          <td>
+            <span class="badge" [class]="alumno.activo ? 'text-bg-success' : 'text-bg-secondary'">
+              {{ alumno.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+          <td class="text-end">
+            <button type="button" class="btn btn-outline-secondary btn-sm me-2" (click)="abrirEditar(alumno)">
+              Editar
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="cambiarEstado(alumno)">
+              {{ alumno.activo ? 'Desactivar' : 'Activar' }}
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

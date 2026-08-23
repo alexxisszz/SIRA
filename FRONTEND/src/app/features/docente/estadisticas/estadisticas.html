@@ -1,0 +1,48 @@
+<h1 class="h4 mb-4">Estadísticas generales</h1>
+
+@if (cargando()) {
+  <p class="text-muted">Cargando estadísticas...</p>
+} @else if (error() || !estadisticas()) {
+  <div class="alert alert-danger">No se pudieron cargar las estadísticas.</div>
+} @else {
+  <div class="row mb-4">
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <p class="text-muted mb-1 small">Evaluaciones totales</p>
+          <p class="h3 mb-0">{{ estadisticas()!.totalEvaluaciones }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card text-center">
+        <div class="card-body">
+          <p class="text-muted mb-1 small">Puntaje promedio</p>
+          <p class="h3 mb-0">{{ estadisticas()!.puntajePromedioGeneral | number: '1.0-1' }}%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="h6 mb-3">Por tema</h2>
+  @for (tema of estadisticas()!.porTema; track tema.temaNombre) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <h3 class="h6">{{ tema.temaNombre }}</h3>
+        <p class="text-muted small mb-2">
+          {{ tema.evaluacionesRealizadas }} evaluaciones · promedio {{ tema.puntajePromedio | number: '1.0-1' }}%
+        </p>
+
+        @if (tema.distribucionNiveles.length > 0) {
+          <div class="d-flex gap-2">
+            @for (nivel of tema.distribucionNiveles; track nivel.nivel) {
+              <span class="badge text-bg-secondary">{{ nivel.nivel }}: {{ nivel.cantidad }}</span>
+            }
+          </div>
+        } @else {
+          <p class="text-muted small mb-0">Sin evaluaciones registradas.</p>
+        }
+      </div>
+    </div>
+  }
+}

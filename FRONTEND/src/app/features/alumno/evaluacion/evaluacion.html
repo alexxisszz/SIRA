@@ -1,0 +1,41 @@
+@if (cargando()) {
+  <p class="text-muted">Cargando evaluación...</p>
+} @else if (error()) {
+  <div class="alert alert-danger">Ocurrió un error al procesar la evaluación.</div>
+} @else {
+  <h1 class="h4 mb-1">Evaluación</h1>
+  <p class="text-muted mb-4">{{ totalRespondidas() }} de {{ preguntas().length }} preguntas respondidas</p>
+
+  @for (pregunta of preguntas(); track pregunta.id) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <p class="fw-medium mb-3">{{ pregunta.enunciado }}</p>
+
+        @for (opcion of pregunta.opciones; track opcion.id) {
+          <div class="form-check mb-2">
+            <input
+              class="form-check-input"
+              type="radio"
+              [name]="pregunta.id"
+              [id]="opcion.id"
+              [checked]="respuestas()[pregunta.id] === opcion.id"
+              (change)="seleccionarOpcion(pregunta.id, opcion.id)"
+            />
+            <label class="form-check-label" [for]="opcion.id">{{ opcion.texto }}</label>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="d-flex justify-content-end">
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="!formularioCompleto() || enviando()"
+      (click)="finalizarEvaluacion()"
+    >
+      {{ enviando() ? 'Enviando...' : 'Finalizar evaluación' }}
+    </button>
+  </div>
+}

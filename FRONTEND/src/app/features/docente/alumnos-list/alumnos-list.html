@@ -1,0 +1,41 @@
+<h1 class="h4 mb-1">Mis alumnos</h1>
+<p class="text-muted mb-4">Progreso general por alumno</p>
+
+@if (cargando()) {
+  <p class="text-muted">Cargando alumnos...</p>
+} @else if (error()) {
+  <div class="alert alert-danger">No se pudo cargar la lista de alumnos.</div>
+} @else if (alumnos().length === 0) {
+  <p class="text-muted">Aún no hay evaluaciones registradas.</p>
+} @else {
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th>Alumno</th>
+        <th>Grado</th>
+        <th>Evaluaciones</th>
+        <th>Último nivel</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (alumno of alumnos(); track alumno.alumnoId) {
+        <tr style="cursor: pointer;" (click)="verDetalle(alumno.alumnoId)">
+          <td>{{ alumno.apellidos }}, {{ alumno.nombres }}</td>
+          <td>{{ alumno.grado }}</td>
+          <td>{{ alumno.evaluacionesRealizadas }}</td>
+          <td>
+            @if (alumno.ultimoNivel !== null) {
+              <span class="badge" [class]="claseNivel(alumno.ultimoNivel)">
+                {{ etiquetaNivel(alumno.ultimoNivel) }}
+              </span>
+            } @else {
+              <span class="text-muted">Sin evaluar</span>
+            }
+          </td>
+          <td class="text-end text-muted">Ver detalle →</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

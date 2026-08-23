@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SistemaRefuerzo.Api/SistemaRefuerzo.Api.csproj" />
+    <Project Path="src/SistemaRefuerzo.Application/SistemaRefuerzo.Application.csproj" />
+    <Project Path="src/SistemaRefuerzo.Domain/SistemaRefuerzo.Domain.csproj" />
+    <Project Path="src/SistemaRefuerzo.Infrastructure/SistemaRefuerzo.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SistemaRefuerzo.Domain.Tests/SistemaRefuerzo.Domain.Tests.csproj" />
+  </Folder>
+</Solution>

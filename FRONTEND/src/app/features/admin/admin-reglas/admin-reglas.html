@@ -1,0 +1,57 @@
+<h1 class="h4 mb-1">Base de Conocimiento</h1>
+<p class="text-muted mb-4">Reglas del motor de inferencia — activa/desactiva o documenta cada una</p>
+
+@if (cargando()) {
+  <p class="text-muted">Cargando reglas...</p>
+} @else {
+  @for (regla of reglas(); track regla.id) {
+    <div class="card mb-3">
+      <div class="card-body">
+        @if (editandoId() === regla.id) {
+          <form [formGroup]="formulario" (ngSubmit)="guardar()">
+            <div class="mb-2">
+              <label class="form-label small">Nombre</label>
+              <input type="text" class="form-control" formControlName="nombre" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">Condición (SI)</label>
+              <input type="text" class="form-control" formControlName="descripcionCondicion" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">Conclusión (ENTONCES)</label>
+              <input type="text" class="form-control" formControlName="descripcionConclusion" />
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Prioridad</label>
+              <input type="number" class="form-control" formControlName="prioridad" style="max-width: 120px;" />
+            </div>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary btn-sm" [disabled]="formulario.invalid">Guardar</button>
+              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelar()">Cancelar</button>
+            </div>
+          </form>
+        } @else {
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h2 class="h6 mb-0">{{ regla.nombre }}</h2>
+            <span class="badge" [class]="regla.activa ? 'text-bg-success' : 'text-bg-secondary'">
+              {{ regla.activa ? 'Activa' : 'Inactiva' }}
+            </span>
+          </div>
+          <p class="mb-1 small">
+            <strong>SI</strong> {{ regla.descripcionCondicion }}
+            <strong>ENTONCES</strong> {{ regla.descripcionConclusion }}
+          </p>
+          <p class="text-muted small mb-3">
+            Prioridad {{ regla.prioridad }} · clase <code>{{ regla.nombreClaseRegla }}</code>
+          </p>
+          <button type="button" class="btn btn-outline-secondary btn-sm me-2" (click)="abrirEditar(regla)">
+            Editar
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="cambiarEstado(regla)">
+            {{ regla.activa ? 'Desactivar' : 'Activar' }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+}

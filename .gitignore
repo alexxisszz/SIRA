@@ -1,0 +1,22 @@
+# .NET
+BACKEND/**/bin/
+BACKEND/**/obj/
+*.user
+
+# Node / Angular
+FRONTEND/node_modules/
+FRONTEND/dist/
+FRONTEND/.angular/
+
+# Editores / SO
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

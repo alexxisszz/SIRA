@@ -1,0 +1,141 @@
+# Contexto del Proyecto
+
+Estoy desarrollando una tesis de Ingeniería de Sistemas titulada:
+
+"Desarrollo de un sistema inteligente para el refuerzo académico y su influencia en el rendimiento académico de estudiantes de un colegio en Lima, 2026"
+
+## Objetivo del sistema
+
+Desarrollar un sistema inteligente para reforzar el aprendizaje de estudiantes de secundaria y evaluar su influencia en el rendimiento académico.
+
+## Alcance de la primera versión
+
+El sistema solo trabajará con dos temas del curso de Aritmética:
+
+* Porcentajes I
+* Porcentajes II
+
+No se desarrollarán otros cursos ni otros temas en esta primera versión.
+
+## Tipo de sistema inteligente
+
+El sistema NO utilizará Machine Learning ni modelos de IA generativa.
+
+Será un Sistema Inteligente Basado en Reglas (Rule-Based System).
+
+La inteligencia estará implementada mediante:
+
+* Base de conocimientos
+* Base de hechos
+* Motor de inferencia
+* Reglas IF-THEN
+
+Ejemplos:
+
+SI puntaje < 50
+ENTONCES asignar ejercicios básicos.
+
+SI puntaje >= 50 Y puntaje < 80
+ENTONCES asignar ejercicios intermedios.
+
+SI puntaje >= 80
+ENTONCES habilitar ejercicios avanzados.
+
+SI el estudiante falla tres veces consecutivas
+ENTONCES mostrar teoría y ejercicios de refuerzo.
+
+## Usuarios
+
+### Administrador
+
+* Gestionar alumnos
+* Gestionar docentes
+* Gestionar preguntas
+* Gestionar temas
+* Ver reportes
+
+### Docente
+
+* Ver progreso de estudiantes
+* Ver resultados
+* Ver estadísticas
+
+### Alumno
+
+* Resolver evaluaciones
+* Resolver ejercicios
+* Recibir recomendaciones
+* Ver progreso
+
+## Flujo del sistema
+
+1. El alumno inicia sesión.
+2. Realiza una evaluación diagnóstica.
+3. El sistema analiza los resultados.
+4. El motor de reglas determina el nivel del estudiante.
+5. Se asignan ejercicios personalizados.
+6. El alumno vuelve a ser evaluado.
+7. Se actualiza su progreso.
+
+## Arquitectura deseada
+
+Frontend:
+
+* Angular 20
+* TypeScript
+* Bootstrap
+
+Backend:
+
+* ASP.NET Core Web API (.NET 10)
+* C#
+
+Base de datos:
+
+* SQL Server
+
+Arquitectura:
+
+* Frontend Angular
+* API REST ASP.NET Core
+* SQL Server
+
+## Base de datos inicial
+
+Tablas principales:
+
+Usuario
+Alumno
+Docente
+Tema
+Pregunta
+Evaluacion
+Respuesta
+Recomendacion
+Resultado
+
+## Requerimientos importantes
+
+* Código limpio.
+* Arquitectura escalable.
+* Uso de DTOs.
+* Repository Pattern.
+* Service Layer.
+* Entity Framework Core.
+* JWT Authentication.
+* Buenas prácticas SOLID.
+
+## Lo que necesito de ti
+
+Quiero que me ayudes a desarrollar este sistema paso a paso.
+
+Antes de generar código:
+
+1. Analiza la arquitectura.
+2. Propón mejoras.
+3. Diseña la base de datos completa.
+4. Diseña los casos de uso.
+5. Diseña los endpoints.
+6. Diseña el motor de reglas.
+
+Después de validar el diseño, recién comenzaremos a programar.

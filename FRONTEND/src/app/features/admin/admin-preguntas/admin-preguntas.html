@@ -1,0 +1,86 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1 class="h4 mb-0">Preguntas</h1>
+  <button type="button" class="btn btn-primary btn-sm" (click)="abrirCrear()">+ Nueva pregunta</button>
+</div>
+
+@if (mostrarFormulario()) {
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h6 mb-3">{{ editando() ? 'Editar pregunta' : 'Nueva pregunta' }}</h2>
+      <form [formGroup]="formulario" (ngSubmit)="guardar()">
+        <div class="mb-2">
+          <label class="form-label small">Enunciado</label>
+          <textarea class="form-control" formControlName="enunciado" rows="2"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small">Nivel de dificultad</label>
+          <select class="form-select" formControlName="nivelDificultad">
+            <option [value]="NivelDificultad.Basico">Básico</option>
+            <option [value]="NivelDificultad.Intermedio">Intermedio</option>
+            <option [value]="NivelDificultad.Avanzado">Avanzado</option>
+          </select>
+        </div>
+
+        <label class="form-label small">Opciones (marca la correcta)</label>
+        @for (opcion of opciones.controls; track $index) {
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <input
+              type="radio"
+              name="opcionCorrecta"
+              [checked]="opcionCorrectaIndex() === $index"
+              (change)="marcarComoCorrecta($index)"
+            />
+            <input type="text" class="form-control" [formControl]="opcion" placeholder="Texto de la opción" />
+            @if (opciones.length > 2) {
+              <button type="button" class="btn btn-outline-danger btn-sm" (click)="quitarOpcion($index)">✕</button>
+            }
+          </div>
+        }
+
+        <button type="button" class="btn btn-outline-secondary btn-sm mb-3" (click)="agregarOpcion()">
+          + Agregar opción
+        </button>
+
+        @if (error()) {
+          <div class="alert alert-danger py-2">{{ error() }}</div>
+        }
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm" [disabled]="formulario.invalid || opciones.length < 2">
+            Guardar
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelar()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+@if (cargando()) {
+  <p class="text-muted">Cargando preguntas...</p>
+} @else if (preguntas().length === 0) {
+  <p class="text-muted">Este tema aún no tiene preguntas.</p>
+} @else {
+  @for (pregunta of preguntas(); track pregunta.id) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <p class="fw-medium mb-0">{{ pregunta.enunciado }}</p>
+          <span class="badge text-bg-secondary">{{ etiquetaNivel[pregunta.nivelDificultad] }}</span>
+        </div>
+        <ul class="list-unstyled mb-3 small">
+          @for (opcion of pregunta.opciones; track opcion.id) {
+            <li [class.text-success]="opcion.esCorrecta" [class.fw-bold]="opcion.esCorrecta">
+              {{ opcion.esCorrecta ? '✓' : '·' }} {{ opcion.texto }}
+            </li>
+          }
+        </ul>
+        <button type="button" class="btn btn-outline-secondary btn-sm me-2" (click)="abrirEditar(pregunta)">
+          Editar
+        </button>
+        <button type="button" class="btn btn-outline-danger btn-sm" (click)="eliminar(pregunta)">Eliminar</button>
+      </div>
+    </div>
+  }
+}

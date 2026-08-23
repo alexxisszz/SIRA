@@ -1,0 +1,65 @@
+<div class="login-page d-flex">
+  <div class="login-visual d-none d-md-block"></div>
+
+  <div class="login-panel d-flex align-items-center justify-content-center">
+    <div class="login-panel__content">
+      <div class="text-center mb-4">
+        <img src="images/logo-sistema.png" alt="Escudo del colegio" class="login-panel__logo" />
+      </div>
+
+      <p class="login-titulo text-center mb-4">
+        <i class="bi bi-chevron-double-right"></i>
+        INICIA SESIÓN
+        <i class="bi bi-chevron-double-left"></i>
+      </p>
+
+      <form [formGroup]="formulario" (ngSubmit)="onSubmit()">
+        <div class="login-input mb-3">
+          <i class="bi bi-person-fill"></i>
+          <label for="correoElectronico" class="visually-hidden">Correo institucional</label>
+          <input
+            id="correoElectronico"
+            type="email"
+            class="login-input__field"
+            placeholder="Usuario"
+            formControlName="correoElectronico"
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="login-input mb-4">
+          <i class="bi bi-lock-fill"></i>
+          <label for="contrasena" class="visually-hidden">Contraseña</label>
+          <input
+            id="contrasena"
+            [type]="mostrarContrasena() ? 'text' : 'password'"
+            class="login-input__field"
+            placeholder="Contraseña"
+            formControlName="contrasena"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="login-input__toggle"
+            (click)="alternarMostrarContrasena()"
+            [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          >
+            <i class="bi" [class.bi-eye-fill]="!mostrarContrasena()" [class.bi-eye-slash-fill]="mostrarContrasena()"></i>
+          </button>
+        </div>
+
+        @if (error()) {
+          <div class="alert alert-danger py-2 small" role="alert">{{ error() }}</div>
+        }
+
+        <button type="submit" class="login-boton w-100" [disabled]="formulario.invalid || cargando()">
+          {{ cargando() ? 'Ingresando...' : 'Ingresar' }}
+        </button>
+
+        <p class="text-center mt-3 mb-0">
+          <a href="javascript:void(0)" class="login-enlace">¿Olvidaste tu contraseña?</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
