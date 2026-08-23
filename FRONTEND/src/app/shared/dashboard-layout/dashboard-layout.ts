@@ -7,6 +7,7 @@ import { Rol } from '../../core/models/auth.model';
   selector: 'app-dashboard-layout',
   imports: [RouterOutlet, RouterLink],
   templateUrl: './dashboard-layout.html',
+  styleUrl: './dashboard-layout.scss',
 })
 export class DashboardLayout {
   private readonly authService = inject(AuthService);

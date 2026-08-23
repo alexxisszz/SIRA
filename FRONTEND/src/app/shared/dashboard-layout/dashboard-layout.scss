@@ -1,0 +1,30 @@
+.dashboard-nav {
+  height: 3.75rem;
+  background: linear-gradient(160deg, var(--sira-azul-medio), var(--sira-azul-oscuro));
+  box-shadow: 0 0.2rem 0.6rem rgba(10, 47, 107, 0.2);
+}
+
+.dashboard-nav__logo {
+  height: 2.25rem;
+  width: 2.25rem;
+  object-fit: contain;
+  margin-right: 0.6rem;
+}
+
+.dashboard-nav__marca {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.dashboard-nav__link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  &:hover {
+    color: #ffffff;
+  }
+}

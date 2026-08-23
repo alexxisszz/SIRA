@@ -1,27 +1,28 @@
-<nav class="navbar navbar-light bg-light border-bottom px-4">
-  <span class="navbar-brand mb-0 h1">Refuerzo Académico</span>
+<nav class="dashboard-nav d-flex align-items-center px-4">
+  <img src="images/logo-sistema.png" alt="Logo del sistema" class="dashboard-nav__logo" />
+  <span class="dashboard-nav__marca mb-0">Refuerzo Académico</span>
 
   @if (rol() === Rol.Docente) {
-    <div class="d-flex gap-3 mx-4">
-      <a routerLink="/docente/alumnos" class="link-secondary text-decoration-none">Alumnos</a>
-      <a routerLink="/docente/estadisticas" class="link-secondary text-decoration-none">Estadísticas</a>
+    <div class="d-flex gap-4 ms-5">
+      <a routerLink="/docente/alumnos" class="dashboard-nav__link">Alumnos</a>
+      <a routerLink="/docente/estadisticas" class="dashboard-nav__link">Estadísticas</a>
     </div>
   }
 
   @if (rol() === Rol.Administrador) {
-    <div class="d-flex gap-3 mx-4">
-      <a routerLink="/admin/alumnos" class="link-secondary text-decoration-none">Alumnos</a>
-      <a routerLink="/admin/docentes" class="link-secondary text-decoration-none">Docentes</a>
-      <a routerLink="/admin/temas" class="link-secondary text-decoration-none">Temas</a>
-      <a routerLink="/admin/reglas" class="link-secondary text-decoration-none">Reglas</a>
+    <div class="d-flex gap-4 ms-5">
+      <a routerLink="/admin/alumnos" class="dashboard-nav__link">Alumnos</a>
+      <a routerLink="/admin/docentes" class="dashboard-nav__link">Docentes</a>
+      <a routerLink="/admin/temas" class="dashboard-nav__link">Temas</a>
+      <a routerLink="/admin/reglas" class="dashboard-nav__link">Reglas</a>
     </div>
   }
 
-  <button type="button" class="btn btn-outline-secondary btn-sm ms-auto" (click)="cerrarSesion()">
+  <button type="button" class="btn btn-outline-light btn-sm ms-auto" (click)="cerrarSesion()">
     Cerrar sesión
   </button>
 </nav>
 
-<main class="container py-4" style="max-width: 720px;">
+<main class="container py-4" style="max-width: 900px;">
   <router-outlet />
 </main>

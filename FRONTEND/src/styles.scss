@@ -1,1 +1,66 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tema visual global del sistema — mismos colores/estilo que el login. */
+
+:root {
+  --sira-azul-oscuro: #0a2f6b;
+  --sira-azul-medio: #12429c;
+  --sira-azul-claro: #2f6fe0;
+  --sira-gris-texto: #495057;
+  --sira-fondo: #f4f6fb;
+
+  /* Sobreescribe la paleta de Bootstrap 5.3 (variables CSS) sin recompilar Sass */
+  --bs-primary: var(--sira-azul-claro);
+  --bs-primary-rgb: 47, 111, 224;
+  --bs-link-color: var(--sira-azul-claro);
+  --bs-link-color-rgb: 47, 111, 224;
+  --bs-link-hover-color: var(--sira-azul-medio);
+  --bs-body-bg: var(--sira-fondo);
+  --bs-body-color: var(--sira-gris-texto);
+}
+
+body {
+  background-color: var(--sira-fondo);
+}
+
+/* Botones sólidos: mismo azul que el botón "Ingresar" del login */
+.btn-primary {
+  --bs-btn-bg: var(--sira-azul-claro);
+  --bs-btn-border-color: var(--sira-azul-claro);
+  --bs-btn-hover-bg: #2559b8;
+  --bs-btn-hover-border-color: #2559b8;
+  --bs-btn-active-bg: #1f4a99;
+  --bs-btn-active-border-color: #1f4a99;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--sira-azul-claro);
+  --bs-btn-border-color: var(--sira-azul-claro);
+  --bs-btn-hover-bg: var(--sira-azul-claro);
+  --bs-btn-hover-border-color: var(--sira-azul-claro);
+  --bs-btn-active-bg: var(--sira-azul-claro);
+  --bs-btn-active-border-color: var(--sira-azul-claro);
+}
+
+/* Cards con borde superior de acento, look consistente en todo el sistema */
+.card {
+  border: 1px solid #e5e9f2;
+  border-radius: 0.6rem;
+  box-shadow: 0 0.25rem 0.75rem rgba(10, 47, 107, 0.06);
+}
+
+/* Tablas: encabezado con tinte azul suave */
+.table > thead {
+  background-color: #eef2fb;
+}
+
+.table > thead th {
+  color: var(--sira-azul-oscuro);
+  font-weight: 600;
+  border-bottom-width: 1px;
+}
+
+/* Inputs con foco azul consistente */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--sira-azul-claro);
+  box-shadow: 0 0 0 0.2rem rgba(47, 111, 224, 0.2);
+}
