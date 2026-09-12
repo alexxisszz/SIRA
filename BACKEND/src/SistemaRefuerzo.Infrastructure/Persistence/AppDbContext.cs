@@ -17,6 +17,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Regla> Reglas => Set<Regla>();
     public DbSet<Recomendacion> Recomendaciones => Set<Recomendacion>();
     public DbSet<EjercicioRecomendado> EjerciciosRecomendados => Set<EjercicioRecomendado>();
+    public DbSet<VideoApoyo> VideosApoyo => Set<VideoApoyo>();
+    public DbSet<IntentoEjercicio> IntentosEjercicio => Set<IntentoEjercicio>();
+    public DbSet<ContenidoTeorico> ContenidosTeoricos => Set<ContenidoTeorico>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

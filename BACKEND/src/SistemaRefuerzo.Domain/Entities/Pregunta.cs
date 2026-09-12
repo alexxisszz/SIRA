@@ -9,17 +9,32 @@ public class Pregunta
     public Guid Id { get; private set; }
     public Guid TemaId { get; private set; }
     public string Enunciado { get; private set; } = null!;
+    public string Subtema { get; private set; } = null!;
     public NivelDesempeno NivelDificultad { get; private set; }
+    public TipoPregunta Tipo { get; private set; }
+    public string? Explicacion { get; private set; }
+    public int Puntaje { get; private set; }
     public IReadOnlyCollection<OpcionPregunta> Opciones => _opciones.AsReadOnly();
 
     private Pregunta() { }
 
-    public Pregunta(Guid temaId, string enunciado, NivelDesempeno nivelDificultad)
+    public Pregunta(
+        Guid temaId,
+        string enunciado,
+        NivelDesempeno nivelDificultad,
+        string subtema,
+        TipoPregunta tipo = TipoPregunta.OpcionMultiple,
+        string? explicacion = null,
+        int puntaje = 1)
     {
         Id = Guid.NewGuid();
         TemaId = temaId;
         Enunciado = enunciado;
         NivelDificultad = nivelDificultad;
+        Subtema = subtema;
+        Tipo = tipo;
+        Explicacion = explicacion;
+        Puntaje = puntaje;
     }
 
     public void AgregarOpcion(string texto, bool esCorrecta)
@@ -27,10 +42,21 @@ public class Pregunta
         _opciones.Add(new OpcionPregunta(Id, texto, esCorrecta));
     }
 
-    public void ActualizarContenido(string enunciado, NivelDesempeno nivelDificultad, IEnumerable<(string Texto, bool EsCorrecta)> opciones)
+    public void ActualizarContenido(
+        string enunciado,
+        NivelDesempeno nivelDificultad,
+        string subtema,
+        TipoPregunta tipo,
+        string? explicacion,
+        int puntaje,
+        IEnumerable<(string Texto, bool EsCorrecta)> opciones)
     {
         Enunciado = enunciado;
         NivelDificultad = nivelDificultad;
+        Subtema = subtema;
+        Tipo = tipo;
+        Explicacion = explicacion;
+        Puntaje = puntaje;
 
         _opciones.Clear();
         foreach (var opcion in opciones)

@@ -1,0 +1,292 @@
+@if (cargando()) {
+  <p class="text-muted">Cargando...</p>
+} @else if (error() || !estado()) {
+  <div class="alert alert-danger">No se pudo cargar el estado del tema.</div>
+} @else if (!estado()!.temaDesbloqueado) {
+  <div class="alert alert-warning">
+    Debes aprobar la prueba final del tema anterior para acceder a este tema.
+  </div>
+  <button type="button" class="btn btn-outline-secondary" routerLink="/temas">Volver a temas</button>
+} @else {
+  <div class="tema-detalle">
+    <header class="tema-detalle__topbar">
+      <nav class="tema-detalle__breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/temas" class="tema-detalle__breadcrumb-home">
+          <i class="bi bi-house-door"></i>
+        </a>
+        <i class="bi bi-chevron-right tema-detalle__breadcrumb-separator"></i>
+        <a routerLink="/temas">Temas</a>
+        <i class="bi bi-chevron-right tema-detalle__breadcrumb-separator"></i>
+        <span class="tema-detalle__breadcrumb-current">{{ temaNombre() }}</span>
+      </nav>
+
+      <div class="tema-detalle__userbar">
+        <button type="button" class="tema-detalle__icon-button" aria-label="Notificaciones">
+          <i class="bi bi-bell"></i>
+        </button>
+        @if (perfil(); as p) {
+          <div class="tema-detalle__user">
+            <span class="tema-detalle__avatar">{{ iniciales() }}</span>
+            <div class="tema-detalle__user-info">
+              <p class="tema-detalle__user-name mb-0">{{ p.nombres }} {{ p.apellidos }}</p>
+              <p class="tema-detalle__user-role mb-0">Estudiante</p>
+            </div>
+            <i class="bi bi-chevron-down tema-detalle__user-chevron"></i>
+          </div>
+        }
+      </div>
+    </header>
+
+    <div class="tema-detalle__layout">
+      <section class="tema-detalle__main">
+        <article class="tema-detalle__hero">
+          <div class="tema-detalle__hero-icon">
+            <i class="bi bi-percent"></i>
+          </div>
+
+          <div class="tema-detalle__hero-copy">
+            <h1 class="tema-detalle__title">{{ temaNombre() }}</h1>
+            <p class="tema-detalle__subtitle">{{ descripcionTema() }}</p>
+          </div>
+
+          <div class="tema-detalle__hero-meta">
+            <span class="tema-detalle__hero-pill">
+              <i class="bi bi-clock"></i>
+              {{ heroEtiqueta() }}
+            </span>
+            <p class="tema-detalle__hero-note">{{ heroNota() }}</p>
+          </div>
+        </article>
+
+        @if (videos().length > 0) {
+          <article class="tema-detalle__video-section">
+            <div class="tema-detalle__section-heading">
+              <span class="tema-detalle__section-icon tema-detalle__section-icon--play">
+                <i class="bi bi-play-fill"></i>
+              </span>
+              <div>
+                <h2 class="tema-detalle__section-title">Videos de apoyo</h2>
+                <p class="tema-detalle__section-text">
+                  Revisa estos videos para reforzar los conceptos de este tema.
+                </p>
+              </div>
+            </div>
+
+            <div class="tema-detalle__video-list">
+              @for (video of videos(); track video.titulo) {
+                <div class="tema-detalle__video-item">
+                  <p class="tema-detalle__video-item-titulo">{{ video.titulo }}</p>
+                  <div class="ratio ratio-16x9 tema-detalle__video-frame">
+                    <iframe [src]="video.url" [title]="video.titulo" allowfullscreen></iframe>
+                  </div>
+                </div>
+              }
+            </div>
+          </article>
+        }
+
+        @if (!estado()!.diagnosticoCompletado) {
+          <div class="tema-detalle__benefits">
+            <article class="tema-detalle__benefit-card">
+              <span class="tema-detalle__benefit-icon tema-detalle__benefit-icon--violet">
+                <i class="bi bi-bullseye"></i>
+              </span>
+              <div>
+                <h3>Conoce tu nivel</h3>
+                <p>La prueba evalúa tus conocimientos actuales.</p>
+              </div>
+            </article>
+
+            <article class="tema-detalle__benefit-card">
+              <span class="tema-detalle__benefit-icon tema-detalle__benefit-icon--lilac">
+                <i class="bi bi-bar-chart-line"></i>
+              </span>
+              <div>
+                <h3>Ejercicios personalizados</h3>
+                <p>Recibirás ejercicios según tu resultado.</p>
+              </div>
+            </article>
+
+            <article class="tema-detalle__benefit-card">
+              <span class="tema-detalle__benefit-icon tema-detalle__benefit-icon--blue">
+                <i class="bi bi-book"></i>
+              </span>
+              <div>
+                <h3>Aprendizaje a tu ritmo</h3>
+                <p>Avanza paso a paso con explicaciones claras.</p>
+              </div>
+            </article>
+
+            <article class="tema-detalle__benefit-card">
+              <span class="tema-detalle__benefit-icon tema-detalle__benefit-icon--yellow">
+                <i class="bi bi-lightbulb-fill"></i>
+              </span>
+              <div>
+                <h3>Mejora tu rendimiento</h3>
+                <p>Refuerza lo que necesitas y alcanza tus metas.</p>
+              </div>
+            </article>
+          </div>
+        } @else {
+          <article class="tema-detalle__video-section">
+            <div class="tema-detalle__section-heading">
+              <span class="tema-detalle__section-icon">
+                <i class="bi bi-layers"></i>
+              </span>
+              <div>
+                <h2 class="tema-detalle__section-title">Niveles del tema</h2>
+                <p class="tema-detalle__section-text">Aprueba cada nivel para desbloquear el siguiente.</p>
+              </div>
+            </div>
+
+            <div class="tema-detalle__nivel-list">
+              @for (item of niveles(); track item.nivel) {
+                <div class="tema-detalle__nivel-card">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <p class="tema-detalle__nivel-titulo mb-0">
+                      Nivel {{ item.etiqueta }}
+                      @if (item.aprobado) {
+                        <span class="tema-detalle__step-tag">Aprobado</span>
+                      }
+                    </p>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline-secondary"
+                      (click)="alternarTeoria(item.nivel)"
+                    >
+                      {{ teoriaAbierta() === item.nivel ? 'Ocultar teoría' : 'Ver teoría' }}
+                    </button>
+                  </div>
+
+                  @if (teoriaAbierta() === item.nivel) {
+                    <div class="tema-detalle__nivel-teoria">
+                      <p class="fw-medium mb-1">{{ item.teoria.titulo }}</p>
+                      @for (parrafo of item.teoria.parrafos; track parrafo) {
+                        <p class="text-muted mb-1 small">{{ parrafo }}</p>
+                      }
+                    </div>
+                  }
+
+                  @if (item.desbloqueado) {
+                    <div class="d-flex gap-2">
+                      <button type="button" class="btn btn-primary btn-sm" (click)="iniciarNivel(item.nivel)">
+                        {{ item.aprobado ? 'Volver a rendir' : 'Rendir prueba' }}
+                      </button>
+                      <button type="button" class="btn btn-outline-primary btn-sm" (click)="practicarNivel(item.nivel)">
+                        Practicar
+                      </button>
+                    </div>
+                  } @else {
+                    <p class="text-muted small mb-0">
+                      <i class="bi bi-lock-fill"></i> Aprueba el nivel anterior para desbloquear esta prueba.
+                    </p>
+                  }
+                </div>
+              }
+
+              <div class="tema-detalle__nivel-card" [class.tema-detalle__nivel-card--aprobado]="estado()!.finalAprobada">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <p class="tema-detalle__nivel-titulo mb-0">
+                    Prueba final del tema
+                    @if (estado()!.finalAprobada) {
+                      <span class="tema-detalle__step-tag">Aprobada</span>
+                    }
+                  </p>
+                </div>
+
+                @if (estado()!.avanzadoAprobado) {
+                  <button type="button" class="btn btn-primary btn-sm" (click)="iniciarFinal()">
+                    {{ estado()!.finalAprobada ? 'Volver a rendir' : 'Rendir prueba final' }}
+                  </button>
+                } @else {
+                  <p class="text-muted small mb-0">
+                    <i class="bi bi-lock-fill"></i> Aprueba el nivel Avanzado para desbloquear la prueba final.
+                  </p>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+
+      <aside class="tema-detalle__sidebar">
+        <section class="tema-detalle__sidebar-card tema-detalle__sidebar-card--steps">
+          <div class="tema-detalle__sidebar-title">
+            <span class="tema-detalle__sidebar-title-icon">
+              <i class="bi bi-book"></i>
+            </span>
+            <h2>Contenido del tema</h2>
+          </div>
+
+          <div class="tema-detalle__stepper">
+            @for (paso of pasos; track paso.numero) {
+              <div class="tema-detalle__step" [class]="'tema-detalle__step--' + estadoPaso(paso)">
+                <span class="tema-detalle__step-number">
+                  @if (estadoPaso(paso) === 'completado') {
+                    <i class="bi bi-check-lg"></i>
+                  } @else {
+                    {{ paso.numero }}
+                  }
+                </span>
+                <div class="tema-detalle__step-copy">
+                  <p class="tema-detalle__step-title mb-0">
+                    {{ paso.titulo }}
+                    @if (estadoPaso(paso) === 'actual') {
+                      <span class="tema-detalle__step-tag">Actual</span>
+                    }
+                  </p>
+                  <p class="tema-detalle__step-text mb-0">{{ paso.descripcion }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </section>
+
+        @if (progresoPractica().length > 0) {
+          <section class="tema-detalle__sidebar-card">
+            <div class="tema-detalle__sidebar-title">
+              <span class="tema-detalle__sidebar-title-icon">
+                <i class="bi bi-graph-up"></i>
+              </span>
+              <h2>Tu progreso de práctica</h2>
+            </div>
+
+            <ul class="list-unstyled mb-0 small">
+              @for (item of progresoPractica(); track item.subtema) {
+                <li class="d-flex justify-content-between mb-1">
+                  <span>{{ item.subtema }}</span>
+                  <span class="text-muted">{{ item.aciertos }}/{{ item.intentos }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <section class="tema-detalle__sidebar-card tema-detalle__sidebar-card--tip">
+          <div class="tema-detalle__sidebar-title tema-detalle__sidebar-title--tip">
+            <span class="tema-detalle__sidebar-title-icon tema-detalle__sidebar-title-icon--tip">
+              <i class="bi bi-lightbulb-fill"></i>
+            </span>
+            <h2>Consejo</h2>
+          </div>
+
+          <p class="tema-detalle__tip-text">
+            @if (!estado()!.diagnosticoCompletado) {
+              No te preocupes si no sabes todas las respuestas. Esta prueba es solo para conocer tu nivel y
+              personalizar tu aprendizaje.
+            } @else {
+              Revisa la teoría de cada nivel antes de rendir la prueba para reforzar tus conceptos.
+            }
+          </p>
+        </section>
+
+        @if (!estado()!.diagnosticoCompletado) {
+          <button type="button" class="tema-detalle__cta" (click)="iniciarDiagnostico()">
+            <i class="bi bi-arrow-right"></i>
+            Rendir prueba de entrada
+          </button>
+        }
+      </aside>
+    </div>
+  </div>
+}

@@ -1,11 +1,11 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { DocenteService } from '../services/docente.service';
 import { Estadisticas as EstadisticasModel } from '../models/docente.model';
+import { convertirAVigesimal } from '../../../shared/utils/calificacion.util';
 
 @Component({
   selector: 'app-estadisticas',
-  imports: [DecimalPipe],
+  imports: [],
   templateUrl: './estadisticas.html',
 })
 export class Estadisticas {
@@ -26,5 +26,9 @@ export class Estadisticas {
         this.cargando.set(false);
       },
     });
+  }
+
+  notaVigesimal(puntaje: number): number {
+    return convertirAVigesimal(puntaje);
   }
 }

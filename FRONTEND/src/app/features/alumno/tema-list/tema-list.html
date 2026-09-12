@@ -1,20 +1,198 @@
-<h1 class="h4 mb-1">Matemáticas</h1>
-<p class="text-muted mb-4">Selecciona el tema que quieres evaluar</p>
-
 @if (cargando()) {
-  <p class="text-muted">Cargando temas...</p>
+  <p class="text-muted">Cargando...</p>
 } @else if (error()) {
   <div class="alert alert-danger">No se pudieron cargar los temas.</div>
 } @else {
-  <div class="list-group">
-    @for (tema of temas(); track tema.id) {
-      <button
-        type="button"
-        class="list-group-item list-group-item-action"
-        (click)="seleccionarTema(tema.id)"
-      >
-        {{ tema.nombre }}
-      </button>
+  <div class="tema-list__topbar mb-2">
+    <i class="bi bi-bell"></i>
+    @if (perfil(); as p) {
+      <div class="tema-list__usuario">
+        <span class="tema-list__avatar">{{ iniciales() }}</span>
+        <div>
+          <p class="mb-0 fw-semibold small">{{ p.nombres }} {{ p.apellidos }}</p>
+          <p class="mb-0 text-muted" style="font-size: 0.72rem;">Estudiante</p>
+        </div>
+      </div>
     }
+  </div>
+
+  <div class="tema-list__hero mb-4">
+    <div class="tema-list__hero-texto">
+      <h1 class="tema-list__titulo mb-2">Matemáticas</h1>
+      <p class="text-muted mb-0">
+        Refuerza tus conocimientos resolviendo ejercicios adaptados a tu nivel. Selecciona un tema para comenzar.
+      </p>
+    </div>
+    <div class="tema-list__hero-frase">
+      <i class="bi bi-quote"></i>
+      <p class="mb-0">"La práctica constante te acerca a tus metas."</p>
+    </div>
+  </div>
+
+  <div class="tema-list__layout">
+    <div class="tema-list__principal">
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <i class="bi bi-collection text-primary"></i>
+        <h2 class="h6 mb-0">Temas disponibles</h2>
+      </div>
+      <p class="text-muted small mb-3">
+        Selecciona el tema que quieres evaluar. Cada tema tiene sus propios videos, teoría y ejercicios.
+      </p>
+
+      <div class="tema-grid mb-4">
+        @for (tema of temas(); track tema.id) {
+          <button
+            type="button"
+            class="tema-card"
+            [class.tema-card--bloqueado]="!tema.estado?.temaDesbloqueado"
+            (click)="seleccionarTema(tema)"
+          >
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="tema-card__icono"><i class="bi bi-percent"></i></span>
+              @if (estadoTexto(tema)) {
+                <span class="tema-card__badge" [class]="estadoClase(tema)">
+                  @if (!tema.estado?.temaDesbloqueado) {
+                    <i class="bi bi-lock-fill"></i>
+                  } @else if (!tema.estado?.diagnosticoCompletado) {
+                    <i class="bi bi-clock-history"></i>
+                  }
+                  {{ estadoTexto(tema) }}
+                </span>
+              }
+            </div>
+
+            <p class="tema-card__categoria mb-1">Aritmética</p>
+            <p class="tema-card__nombre mb-1">{{ tema.nombre }}</p>
+            <p class="tema-card__descripcion mb-3">{{ descripcion(tema) }}</p>
+
+            <div class="tema-card__progreso-fila">
+              <span class="text-muted">Tu progreso</span>
+              <span class="fw-medium">{{ progresoPorcentaje(tema) }}%</span>
+            </div>
+            <div class="tema-card__barra">
+              <div class="tema-card__barra-relleno" [style.width.%]="progresoPorcentaje(tema)"></div>
+            </div>
+
+            <span
+              class="tema-card__accion"
+              [class.tema-card__accion--deshabilitada]="!tema.estado?.temaDesbloqueado"
+            >
+              {{ tema.estado?.temaDesbloqueado ? 'Comenzar' : 'Bloqueado' }}
+              <i class="bi bi-chevron-right"></i>
+            </span>
+          </button>
+        }
+      </div>
+
+      <div class="tema-list__como-funciona">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <i class="bi bi-bullseye text-primary"></i>
+          <h2 class="h6 mb-0">¿Cómo funciona?</h2>
+        </div>
+        <p class="text-muted small mb-3">Sigue estos pasos para mejorar en Matemáticas.</p>
+
+        <div class="tema-list__pasos">
+          <div class="tema-list__paso">
+            <span class="tema-list__paso-numero">1</span>
+            <i class="bi bi-clipboard-check tema-list__paso-icono"></i>
+            <p class="fw-semibold small mb-1">Realiza la prueba de entrada</p>
+            <p class="text-muted small mb-0">El sistema evaluará tu nivel actual.</p>
+          </div>
+          <i class="bi bi-arrow-right tema-list__paso-flecha"></i>
+          <div class="tema-list__paso">
+            <span class="tema-list__paso-numero">2</span>
+            <i class="bi bi-book tema-list__paso-icono"></i>
+            <p class="fw-semibold small mb-1">Aprende y practica</p>
+            <p class="text-muted small mb-0">Revisa la teoría y resuelve ejercicios adaptados a tu nivel.</p>
+          </div>
+          <i class="bi bi-arrow-right tema-list__paso-flecha"></i>
+          <div class="tema-list__paso">
+            <span class="tema-list__paso-numero">3</span>
+            <i class="bi bi-bar-chart tema-list__paso-icono"></i>
+            <p class="fw-semibold small mb-1">Recibe recomendaciones</p>
+            <p class="text-muted small mb-0">El sistema te sugerirá ejercicios según tu desempeño.</p>
+          </div>
+          <i class="bi bi-arrow-right tema-list__paso-flecha"></i>
+          <div class="tema-list__paso">
+            <span class="tema-list__paso-numero">4</span>
+            <i class="bi bi-graph-up-arrow tema-list__paso-icono"></i>
+            <p class="fw-semibold small mb-1">Mejora tu rendimiento</p>
+            <p class="text-muted small mb-0">Avanza de nivel y alcanza tus metas.</p>
+          </div>
+        </div>
+
+        <div class="tema-list__recordatorio mt-3">
+          <i class="bi bi-star-fill"></i>
+          <span>Recuerda: la constancia es la clave para el éxito.</span>
+          <span class="ms-auto fw-semibold">¡Tú puedes!</span>
+        </div>
+      </div>
+    </div>
+
+    <aside class="tema-list__panel">
+      <div class="tema-list__panel-card text-center">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <i class="bi bi-bar-chart-fill text-primary"></i>
+          <h2 class="h6 mb-0">Tu progreso general</h2>
+        </div>
+        <div class="tema-list__anillo" [style.--progreso.%]="progresoGeneralPorcentaje()">
+          <span>{{ progresoGeneralPorcentaje() }}%</span>
+        </div>
+        <div class="tema-list__stats mt-3">
+          <div class="tema-list__stat">
+            <span class="fw-bold">{{ temasCompletados() }}</span>
+            <span class="text-muted small">Temas completados</span>
+          </div>
+          <div class="tema-list__stat">
+            <span class="fw-bold">{{ ejerciciosCorrectos() }}/{{ ejerciciosIntentados() }}</span>
+            <span class="text-muted small">Ejercicios resueltos</span>
+          </div>
+          <div class="tema-list__stat">
+            <span class="fw-bold">{{ diasDePractica() }}</span>
+            <span class="text-muted small">Días de práctica</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tema-list__panel-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history text-primary"></i>
+            <h2 class="h6 mb-0">Actividad reciente</h2>
+          </div>
+          <a routerLink="/historial" class="small">Ver todo</a>
+        </div>
+
+        @if (actividadReciente().length === 0) {
+          <div class="text-center py-3">
+            <i class="bi bi-journal-text tema-list__vacio-icono"></i>
+            <p class="fw-medium small mb-1">Aún no has realizado actividades</p>
+            <p class="text-muted small mb-0">
+              Cuando resuelvas ejercicios, aquí verás tu historial reciente.
+            </p>
+          </div>
+        } @else {
+          @for (item of actividadReciente(); track item.evaluacionId) {
+            <div class="tema-list__actividad-item">
+              <p class="mb-0 small fw-medium">{{ item.temaNombre }}</p>
+              <p class="mb-0 text-muted" style="font-size: 0.75rem;">
+                {{ item.fechaCalculo | date: 'dd/MM/yyyy' }} · {{ item.puntaje }}%
+              </p>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="tema-list__panel-card tema-list__consejo">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-lightbulb-fill"></i>
+          <h2 class="h6 mb-0">Consejo del día</h2>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <p class="mb-0 small flex-grow-1">{{ consejo() }}</p>
+          <img src="images/libro.png" alt="" class="tema-list__consejo-icono" />
+        </div>
+      </div>
+    </aside>
   </div>
 }

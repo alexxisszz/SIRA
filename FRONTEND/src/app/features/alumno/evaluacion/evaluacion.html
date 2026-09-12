@@ -1,41 +1,97 @@
 @if (cargando()) {
-  <p class="text-muted">Cargando evaluación...</p>
+  <p class="text-muted">Cargando evaluaci&oacute;n...</p>
 } @else if (error()) {
-  <div class="alert alert-danger">Ocurrió un error al procesar la evaluación.</div>
+  <div class="alert alert-danger">{{ mensajeError() }}</div>
+  <button type="button" class="btn btn-outline-secondary" routerLink="/temas">Volver a temas</button>
 } @else {
-  <h1 class="h4 mb-1">Evaluación</h1>
-  <p class="text-muted mb-4">{{ totalRespondidas() }} de {{ preguntas().length }} preguntas respondidas</p>
+  <main class="evaluacion">
+    <header class="evaluacion__topbar">
+      <nav class="evaluacion__breadcrumb" aria-label="Breadcrumb">
+        <a routerLink="/temas" aria-label="Inicio"><i class="bi bi-house-door"></i></a>
+        <i class="bi bi-chevron-right"></i>
+        <a routerLink="/temas">Temas</a>
+        <i class="bi bi-chevron-right"></i>
+        <a routerLink="/temas">Porcentajes I</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ titulo() }}</span>
+      </nav>
+    </header>
 
-  @for (pregunta of preguntas(); track pregunta.id) {
-    <div class="card mb-3">
-      <div class="card-body">
-        <p class="fw-medium mb-3">{{ pregunta.enunciado }}</p>
-
-        @for (opcion of pregunta.opciones; track opcion.id) {
-          <div class="form-check mb-2">
-            <input
-              class="form-check-input"
-              type="radio"
-              [name]="pregunta.id"
-              [id]="opcion.id"
-              [checked]="respuestas()[pregunta.id] === opcion.id"
-              (change)="seleccionarOpcion(pregunta.id, opcion.id)"
-            />
-            <label class="form-check-label" [for]="opcion.id">{{ opcion.texto }}</label>
-          </div>
-        }
+    <section class="evaluacion__hero">
+      <div class="evaluacion__hero-icon"><i class="bi bi-percent"></i></div>
+      <div class="evaluacion__hero-copy">
+        <h1>Porcentajes I</h1>
+        <h2>{{ titulo() }}</h2>
+        <p>Esta prueba eval&uacute;a tus conocimientos actuales sobre porcentajes. Responde con calma y elige la alternativa correcta.</p>
       </div>
-    </div>
-  }
+    </section>
 
-  <div class="d-flex justify-content-end">
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="!formularioCompleto() || enviando()"
-      (click)="finalizarEvaluacion()"
-    >
-      {{ enviando() ? 'Enviando...' : 'Finalizar evaluación' }}
-    </button>
-  </div>
+    <div class="evaluacion__layout">
+      <section class="evaluacion__questions" aria-label="Preguntas de la evaluaci&oacute;n">
+        @for (pregunta of preguntas(); track pregunta.id; let indice = $index) {
+          <article class="evaluacion__question-card">
+            <span class="evaluacion__question-number">{{ indice + 1 }}</span>
+            <div class="evaluacion__question-content">
+              <p class="evaluacion__question-text">{{ pregunta.enunciado }}</p>
+
+              <div class="evaluacion__options">
+                @for (opcion of pregunta.opciones; track opcion.id; let opcionIndice = $index) {
+                  <label class="evaluacion__option" [class.evaluacion__option--selected]="respuestas()[pregunta.id] === opcion.id">
+                    <input
+                      type="radio"
+                      [name]="pregunta.id"
+                      [id]="opcion.id"
+                      [checked]="respuestas()[pregunta.id] === opcion.id"
+                      (change)="seleccionarOpcion(pregunta.id, opcion.id)"
+                    />
+                    <span class="evaluacion__radio"></span>
+                    <span>{{ letraOpcion(opcionIndice) }}) {{ opcion.texto }}</span>
+                  </label>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+
+      <aside class="evaluacion__sidebar">
+        <article class="evaluacion__side-card evaluacion__progress-card">
+          <div class="evaluacion__side-heading">
+            <span class="evaluacion__side-icon"><i class="bi bi-percent"></i></span>
+            <h2>Progreso</h2>
+          </div>
+          <p>{{ totalRespondidas() }} de {{ preguntas().length }} preguntas respondidas</p>
+          <div class="evaluacion__progress-row">
+            <div class="evaluacion__progress-track">
+              <span [style.width.%]="porcentajeProgreso()"></span>
+            </div>
+            <strong>{{ porcentajeProgreso() }}%</strong>
+          </div>
+        </article>
+
+        <article class="evaluacion__side-card evaluacion__instructions-card">
+          <div class="evaluacion__side-heading">
+            <span class="evaluacion__side-icon"><i class="bi bi-info-lg"></i></span>
+            <h2>Indicaciones</h2>
+          </div>
+          <ul>
+            <li>Lee bien cada pregunta.</li>
+            <li>Selecciona solo una alternativa.</li>
+            <li>No puedes regresar a preguntas anteriores.</li>
+            <li>Cuando termines, haz clic en &ldquo;Finalizar prueba&rdquo;.</li>
+          </ul>
+        </article>
+
+        <button
+          type="button"
+          class="evaluacion__submit"
+          [disabled]="!formularioCompleto() || enviando()"
+          (click)="finalizarEvaluacion()"
+        >
+          <i class="bi bi-send-fill"></i>
+          {{ enviando() ? 'Enviando...' : 'Finalizar prueba' }}
+        </button>
+      </aside>
+    </div>
+  </main>
 }

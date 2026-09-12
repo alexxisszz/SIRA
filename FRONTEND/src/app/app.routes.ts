@@ -22,15 +22,30 @@ export const routes: Routes = [
         loadComponent: () => import('./features/alumno/tema-list/tema-list').then((m) => m.TemaList),
       },
       {
+        path: 'temas/:temaId',
+        canActivate: [roleGuard([Rol.Alumno])],
+        loadComponent: () => import('./features/alumno/tema-detalle/tema-detalle').then((m) => m.TemaDetalle),
+      },
+      {
         path: 'temas/:temaId/evaluacion',
         canActivate: [roleGuard([Rol.Alumno])],
         loadComponent: () => import('./features/alumno/evaluacion/evaluacion').then((m) => m.Evaluacion),
+      },
+      {
+        path: 'practicar',
+        canActivate: [roleGuard([Rol.Alumno])],
+        loadComponent: () => import('./features/alumno/practicar/practicar').then((m) => m.Practicar),
       },
       {
         path: 'recomendaciones/:recomendacionId',
         canActivate: [roleGuard([Rol.Alumno])],
         loadComponent: () =>
           import('./features/alumno/recomendacion/recomendacion').then((m) => m.Recomendacion),
+      },
+      {
+        path: 'historial',
+        canActivate: [roleGuard([Rol.Alumno])],
+        loadComponent: () => import('./features/alumno/historial/historial').then((m) => m.Historial),
       },
       {
         path: 'docente/alumnos',
@@ -68,6 +83,19 @@ export const routes: Routes = [
         canActivate: [roleGuard([Rol.Administrador])],
         loadComponent: () =>
           import('./features/admin/admin-preguntas/admin-preguntas').then((m) => m.AdminPreguntas),
+      },
+      {
+        path: 'admin/temas/:temaId/videos',
+        canActivate: [roleGuard([Rol.Administrador])],
+        loadComponent: () => import('./features/admin/admin-videos/admin-videos').then((m) => m.AdminVideos),
+      },
+      {
+        path: 'admin/temas/:temaId/teoria',
+        canActivate: [roleGuard([Rol.Administrador])],
+        loadComponent: () =>
+          import('./features/admin/admin-contenido-teorico/admin-contenido-teorico').then(
+            (m) => m.AdminContenidoTeoricoComponent,
+          ),
       },
       {
         path: 'admin/reglas',

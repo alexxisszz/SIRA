@@ -5,6 +5,7 @@ import { DocenteService } from '../services/docente.service';
 import { ResultadoHistorico } from '../models/docente.model';
 import { NivelDesempeno } from '../../alumno/models/recomendacion.model';
 import { CLASE_NIVEL, ETIQUETA_NIVEL } from '../../../shared/utils/nivel.util';
+import { convertirAVigesimal } from '../../../shared/utils/calificacion.util';
 
 @Component({
   selector: 'app-alumno-detalle',
@@ -40,5 +41,9 @@ export class AlumnoDetalle {
 
   claseNivel(nivel: NivelDesempeno): string {
     return CLASE_NIVEL[nivel];
+  }
+
+  notaVigesimal(puntaje: number): number {
+    return convertirAVigesimal(puntaje);
   }
 }

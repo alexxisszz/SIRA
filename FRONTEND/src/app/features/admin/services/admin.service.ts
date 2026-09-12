@@ -4,11 +4,15 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
   AdminAlumno,
+  AdminContenidoTeorico,
   AdminDocente,
   AdminPregunta,
   AdminRegla,
   AdminTema,
+  AdminVideoApoyo,
   NivelDificultad,
+  TipoContenidoTeorico,
+  TipoPregunta,
 } from '../models/admin.model';
 
 export interface OpcionInput {
@@ -73,19 +77,79 @@ export class AdminService {
     return this.http.get<AdminPregunta[]>(`${this.baseUrl}/temas/${temaId}/preguntas`);
   }
 
-  crearPregunta(datos: { temaId: string; enunciado: string; nivelDificultad: NivelDificultad; opciones: OpcionInput[] }) {
+  crearPregunta(datos: {
+    temaId: string;
+    enunciado: string;
+    subtema: string;
+    nivelDificultad: NivelDificultad;
+    tipo: TipoPregunta;
+    explicacion: string | null;
+    puntaje: number;
+    opciones: OpcionInput[];
+  }) {
     return this.http.post<{ preguntaId: string }>(`${this.baseUrl}/preguntas`, datos);
   }
 
   actualizarPregunta(
     preguntaId: string,
-    datos: { enunciado: string; nivelDificultad: NivelDificultad; opciones: OpcionInput[] },
+    datos: {
+      enunciado: string;
+      subtema: string;
+      nivelDificultad: NivelDificultad;
+      tipo: TipoPregunta;
+      explicacion: string | null;
+      puntaje: number;
+      opciones: OpcionInput[];
+    },
   ): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/preguntas/${preguntaId}`, datos);
   }
 
   eliminarPregunta(preguntaId: string): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/preguntas/${preguntaId}`);
+  }
+
+  // Videos de apoyo
+  obtenerVideosPorTema(temaId: string): Observable<AdminVideoApoyo[]> {
+    return this.http.get<AdminVideoApoyo[]>(`${this.baseUrl}/temas/${temaId}/videos`);
+  }
+
+  crearVideo(datos: { temaId: string; titulo: string; url: string }) {
+    return this.http.post<{ videoId: string }>(`${this.baseUrl}/videos`, datos);
+  }
+
+  actualizarVideo(videoId: string, datos: { titulo: string; url: string }): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/videos/${videoId}`, datos);
+  }
+
+  eliminarVideo(videoId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/videos/${videoId}`);
+  }
+
+  // Contenido teórico
+  obtenerTeoriaPorTema(temaId: string): Observable<AdminContenidoTeorico[]> {
+    return this.http.get<AdminContenidoTeorico[]>(`${this.baseUrl}/temas/${temaId}/teoria`);
+  }
+
+  crearContenidoTeorico(datos: {
+    temaId: string;
+    tipo: TipoContenidoTeorico;
+    clave: string;
+    titulo: string;
+    parrafos: string[];
+  }) {
+    return this.http.post<{ contenidoId: string }>(`${this.baseUrl}/teoria`, datos);
+  }
+
+  actualizarContenidoTeorico(
+    contenidoId: string,
+    datos: { clave: string; titulo: string; parrafos: string[] },
+  ): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/teoria/${contenidoId}`, datos);
+  }
+
+  eliminarContenidoTeorico(contenidoId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/teoria/${contenidoId}`);
   }
 
   // Reglas

@@ -22,12 +22,16 @@ public static class DependencyInjection
         services.AddScoped<IDocenteRepository, DocenteRepository>();
         services.AddScoped<ITemaRepository, TemaRepository>();
         services.AddScoped<IPreguntaRepository, PreguntaRepository>();
+        services.AddScoped<IVideoApoyoRepository, VideoApoyoRepository>();
         services.AddScoped<IEvaluacionRepository, EvaluacionRepository>();
         services.AddScoped<IReglaRepository, ReglaRepository>();
         services.AddScoped<IResultadoRepository, ResultadoRepository>();
         services.AddScoped<IRecomendacionRepository, RecomendacionRepository>();
         services.AddScoped<IDocenteQueryRepository, DocenteQueryRepository>();
         services.AddScoped<IAdminQueryRepository, AdminQueryRepository>();
+        services.AddScoped<IIntentoEjercicioRepository, IntentoEjercicioRepository>();
+        services.AddScoped<IPracticaQueryRepository, PracticaQueryRepository>();
+        services.AddScoped<IContenidoTeoricoRepository, ContenidoTeoricoRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();

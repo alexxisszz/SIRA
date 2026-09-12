@@ -2,4 +2,4 @@ using MediatR;
 
 namespace SistemaRefuerzo.Application.Evaluaciones;
 
-public record RegistrarRespuestaCommand(Guid EvaluacionId, Guid PreguntaId, Guid OpcionSeleccionadaId) : IRequest;
+public record RegistrarRespuestaCommand(Guid UsuarioId, Guid EvaluacionId, Guid PreguntaId, Guid OpcionSeleccionadaId) : IRequest;

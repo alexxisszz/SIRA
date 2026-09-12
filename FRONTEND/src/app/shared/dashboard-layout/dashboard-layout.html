@@ -1,28 +1,60 @@
-<nav class="dashboard-nav d-flex align-items-center px-4">
-  <img src="images/logo-sistema.png" alt="Logo del sistema" class="dashboard-nav__logo" />
-  <span class="dashboard-nav__marca mb-0">Refuerzo Académico</span>
-
-  @if (rol() === Rol.Docente) {
-    <div class="d-flex gap-4 ms-5">
-      <a routerLink="/docente/alumnos" class="dashboard-nav__link">Alumnos</a>
-      <a routerLink="/docente/estadisticas" class="dashboard-nav__link">Estadísticas</a>
+<div class="dashboard-shell d-flex">
+  <aside class="dashboard-sidebar d-flex flex-column py-3">
+    <div class="dashboard-sidebar__header">
+      <img src="images/logo-sistema.png" alt="Logo del sistema" class="dashboard-sidebar__logo" />
+      <span class="dashboard-sidebar__marca">SIRA</span>
     </div>
-  }
 
-  @if (rol() === Rol.Administrador) {
-    <div class="d-flex gap-4 ms-5">
-      <a routerLink="/admin/alumnos" class="dashboard-nav__link">Alumnos</a>
-      <a routerLink="/admin/docentes" class="dashboard-nav__link">Docentes</a>
-      <a routerLink="/admin/temas" class="dashboard-nav__link">Temas</a>
-      <a routerLink="/admin/reglas" class="dashboard-nav__link">Reglas</a>
-    </div>
-  }
+    <nav class="d-flex flex-column gap-1 flex-grow-1 w-100 mt-2">
+      @if (rol() === Rol.Alumno) {
+        <a routerLink="/temas" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-journal-text"></i>
+          <span>Temas</span>
+        </a>
+        <a routerLink="/historial" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-clock-history"></i>
+          <span>Mi historial</span>
+        </a>
+      }
 
-  <button type="button" class="btn btn-outline-light btn-sm ms-auto" (click)="cerrarSesion()">
-    Cerrar sesión
-  </button>
-</nav>
+      @if (rol() === Rol.Docente) {
+        <a routerLink="/docente/alumnos" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-people"></i>
+          <span>Alumnos</span>
+        </a>
+        <a routerLink="/docente/estadisticas" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-bar-chart"></i>
+          <span>Estadísticas</span>
+        </a>
+      }
 
-<main class="container py-4" style="max-width: 900px;">
-  <router-outlet />
-</main>
+      @if (rol() === Rol.Administrador) {
+        <a routerLink="/admin/alumnos" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-people"></i>
+          <span>Alumnos</span>
+        </a>
+        <a routerLink="/admin/docentes" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-person-workspace"></i>
+          <span>Docentes</span>
+        </a>
+        <a routerLink="/admin/temas" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-journal-text"></i>
+          <span>Temas</span>
+        </a>
+        <a routerLink="/admin/reglas" routerLinkActive="active" class="dashboard-sidebar__link">
+          <i class="bi bi-diagram-3"></i>
+          <span>Reglas</span>
+        </a>
+      }
+    </nav>
+
+    <button type="button" class="dashboard-sidebar__link dashboard-sidebar__link--salir" (click)="cerrarSesion()">
+      <i class="bi bi-box-arrow-right"></i>
+      <span>Salir</span>
+    </button>
+  </aside>
+
+  <main class="dashboard-content flex-grow-1 py-3 px-4" style="min-width: 0;">
+    <router-outlet />
+  </main>
+</div>

@@ -9,7 +9,7 @@ public class ReglaNivelAvanzado : IRegla
     public int Prioridad => 10;
 
     public bool Evaluar(BaseDeHechos hechos) =>
-        hechos.Obtener<int>(ClavesHechos.Puntaje) >= 80;
+        hechos.Contiene(ClavesHechos.Puntaje) && hechos.Obtener<int>(ClavesHechos.Puntaje) >= 80;
 
     public void Ejecutar(BaseDeHechos hechos) =>
         hechos.Establecer(ClavesHechos.NivelAsignado, NivelDesempeno.Avanzado);

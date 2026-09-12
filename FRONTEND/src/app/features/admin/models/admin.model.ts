@@ -35,12 +35,41 @@ export enum NivelDificultad {
   Avanzado = 2,
 }
 
+export enum TipoPregunta {
+  OpcionMultiple = 0,
+}
+
 export interface AdminPregunta {
   id: string;
   temaId: string;
   enunciado: string;
+  subtema: string;
   nivelDificultad: NivelDificultad;
+  tipo: TipoPregunta;
+  explicacion: string | null;
+  puntaje: number;
   opciones: AdminOpcion[];
+}
+
+export interface AdminVideoApoyo {
+  id: string;
+  temaId: string;
+  titulo: string;
+  url: string;
+}
+
+export enum TipoContenidoTeorico {
+  NivelGeneral = 0,
+  Subtema = 1,
+}
+
+export interface AdminContenidoTeorico {
+  id: string;
+  temaId: string;
+  tipo: TipoContenidoTeorico;
+  clave: string;
+  titulo: string;
+  parrafos: string[];
 }
 
 export interface AdminRegla {

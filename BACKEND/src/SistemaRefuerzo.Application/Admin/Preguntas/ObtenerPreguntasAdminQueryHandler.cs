@@ -15,7 +15,11 @@ public class ObtenerPreguntasAdminQueryHandler(IPreguntaRepository preguntaRepos
                 p.Id,
                 p.TemaId,
                 p.Enunciado,
+                p.Subtema,
                 p.NivelDificultad,
+                p.Tipo,
+                p.Explicacion,
+                p.Puntaje,
                 p.Opciones.Select(o => new AdminOpcionDto(o.Id, o.Texto, o.EsCorrecta)).ToList()))
             .ToList();
     }

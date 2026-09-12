@@ -10,6 +10,9 @@ public class ReglaNivelIntermedio : IRegla
 
     public bool Evaluar(BaseDeHechos hechos)
     {
+        if (!hechos.Contiene(ClavesHechos.Puntaje))
+            return false;
+
         var puntaje = hechos.Obtener<int>(ClavesHechos.Puntaje);
         return puntaje >= 50 && puntaje < 80;
     }

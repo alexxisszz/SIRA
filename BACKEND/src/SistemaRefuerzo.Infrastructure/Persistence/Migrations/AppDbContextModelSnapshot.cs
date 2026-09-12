@@ -53,6 +53,40 @@ namespace SistemaRefuerzo.Infrastructure.Persistence.Migrations
                     b.ToTable("Alumnos");
                 });
 
+            modelBuilder.Entity("SistemaRefuerzo.Domain.Entities.ContenidoTeorico", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("Parrafos")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("TemaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemaId", "Tipo", "Clave");
+
+                    b.ToTable("ContenidosTeoricos");
+                });
+
             modelBuilder.Entity("SistemaRefuerzo.Domain.Entities.Docente", b =>
                 {
                     b.Property<Guid>("Id")
@@ -116,8 +150,21 @@ namespace SistemaRefuerzo.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("FechaInicio")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("NivelEvaluado")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("PreguntasAsignadas")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid>("TemaId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -126,6 +173,47 @@ namespace SistemaRefuerzo.Infrastructure.Persistence.Migrations
                     b.HasIndex("TemaId");
 
                     b.ToTable("Evaluaciones");
+                });
+
+            modelBuilder.Entity("SistemaRefuerzo.Domain.Entities.IntentoEjercicio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AlumnoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("EsCorrecta")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("FechaRegistro")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("OpcionSeleccionadaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PreguntaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Subtema")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<Guid>("TemaId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlumnoId");
+
+                    b.HasIndex("PreguntaId");
+
+                    b.HasIndex("AlumnoId", "Subtema");
+
+                    b.HasIndex("AlumnoId", "TemaId");
+
+                    b.ToTable("IntentosEjercicio");
                 });
 
             modelBuilder.Entity("SistemaRefuerzo.Domain.Entities.OpcionPregunta", b =>
@@ -161,17 +249,36 @@ namespace SistemaRefuerzo.Infrastructure.Persistence.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<string>("Explicacion")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<string>("NivelDificultad")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<int>("Puntaje")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Subtema")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
                     b.Property<Guid>("TemaId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TemaId");
+
+                    b.HasIndex("TemaId", "Subtema");
 
                     b.ToTable("Preguntas");
                 });
@@ -196,6 +303,10 @@ namespace SistemaRefuerzo.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
+
+                    b.Property<string>("SubtemasDominados")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("TemasPorReforzar")
                         .IsRequired()
@@ -343,6 +454,31 @@ namespace SistemaRefuerzo.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("SistemaRefuerzo.Domain.Entities.VideoApoyo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TemaId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemaId");
+
+                    b.ToTable("VideosApoyo");
                 });
 
             modelBuilder.Entity("SistemaRefuerzo.Domain.Entities.EjercicioRecomendado", b =>

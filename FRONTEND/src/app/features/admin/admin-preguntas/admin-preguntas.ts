@@ -4,12 +4,16 @@ import { FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators } 
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AdminService } from '../services/admin.service';
-import { AdminPregunta, NivelDificultad } from '../models/admin.model';
+import { AdminPregunta, NivelDificultad, TipoPregunta } from '../models/admin.model';
 
 const ETIQUETA_NIVEL: Record<NivelDificultad, string> = {
   [NivelDificultad.Basico]: 'Básico',
   [NivelDificultad.Intermedio]: 'Intermedio',
   [NivelDificultad.Avanzado]: 'Avanzado',
+};
+
+const ETIQUETA_TIPO: Record<TipoPregunta, string> = {
+  [TipoPregunta.OpcionMultiple]: 'Opción múltiple',
 };
 
 @Component({
@@ -25,7 +29,9 @@ export class AdminPreguntas {
   private readonly temaId = this.route.snapshot.paramMap.get('temaId')!;
 
   protected readonly NivelDificultad = NivelDificultad;
+  protected readonly TipoPregunta = TipoPregunta;
   protected readonly etiquetaNivel = ETIQUETA_NIVEL;
+  protected readonly etiquetaTipo = ETIQUETA_TIPO;
 
   protected readonly preguntas = signal<AdminPregunta[]>([]);
   protected readonly cargando = signal(true);
@@ -36,7 +42,11 @@ export class AdminPreguntas {
 
   protected readonly formulario = this.formBuilder.nonNullable.group({
     enunciado: ['', Validators.required],
+    subtema: ['', Validators.required],
     nivelDificultad: [NivelDificultad.Basico, Validators.required],
+    tipo: [TipoPregunta.OpcionMultiple, Validators.required],
+    explicacion: [''],
+    puntaje: [1, [Validators.required, Validators.min(1)]],
     opciones: this.formBuilder.array<FormControl<string>>([]),
   });
 
@@ -85,7 +95,14 @@ export class AdminPreguntas {
     this.agregarOpcion();
     this.agregarOpcion();
     this.opcionCorrectaIndex.set(0);
-    this.formulario.patchValue({ enunciado: '', nivelDificultad: NivelDificultad.Basico });
+    this.formulario.patchValue({
+      enunciado: '',
+      subtema: '',
+      nivelDificultad: NivelDificultad.Basico,
+      tipo: TipoPregunta.OpcionMultiple,
+      explicacion: '',
+      puntaje: 1,
+    });
     this.mostrarFormulario.set(true);
   }
 
@@ -95,7 +112,14 @@ export class AdminPreguntas {
     this.opciones.clear();
     pregunta.opciones.forEach((opcion) => this.opciones.push(this.crearControlOpcion(opcion.texto)));
     this.opcionCorrectaIndex.set(pregunta.opciones.findIndex((o) => o.esCorrecta));
-    this.formulario.patchValue({ enunciado: pregunta.enunciado, nivelDificultad: pregunta.nivelDificultad });
+    this.formulario.patchValue({
+      enunciado: pregunta.enunciado,
+      subtema: pregunta.subtema,
+      nivelDificultad: pregunta.nivelDificultad,
+      tipo: pregunta.tipo,
+      explicacion: pregunta.explicacion ?? '',
+      puntaje: pregunta.puntaje,
+    });
     this.mostrarFormulario.set(true);
   }
 
@@ -114,7 +138,15 @@ export class AdminPreguntas {
       esCorrecta: index === this.opcionCorrectaIndex(),
     }));
 
-    const datos = { enunciado: valores.enunciado, nivelDificultad: valores.nivelDificultad, opciones };
+    const datos = {
+      enunciado: valores.enunciado,
+      subtema: valores.subtema,
+      nivelDificultad: valores.nivelDificultad,
+      tipo: valores.tipo,
+      explicacion: valores.explicacion || null,
+      puntaje: valores.puntaje,
+      opciones,
+    };
     const edicion = this.editando();
 
     const operacion: Observable<unknown> = edicion

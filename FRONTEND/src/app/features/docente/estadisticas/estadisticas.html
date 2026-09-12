@@ -17,8 +17,8 @@
     <div class="col-6">
       <div class="card text-center">
         <div class="card-body">
-          <p class="text-muted mb-1 small">Puntaje promedio</p>
-          <p class="h3 mb-0">{{ estadisticas()!.puntajePromedioGeneral | number: '1.0-1' }}%</p>
+          <p class="text-muted mb-1 small">Nota promedio</p>
+          <p class="h3 mb-0">{{ notaVigesimal(estadisticas()!.puntajePromedioGeneral) }}/20</p>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
       <div class="card-body">
         <h3 class="h6">{{ tema.temaNombre }}</h3>
         <p class="text-muted small mb-2">
-          {{ tema.evaluacionesRealizadas }} evaluaciones · promedio {{ tema.puntajePromedio | number: '1.0-1' }}%
+          {{ tema.evaluacionesRealizadas }} evaluaciones · promedio {{ notaVigesimal(tema.puntajePromedio) }}/20
         </p>
 
         @if (tema.distribucionNiveles.length > 0) {

@@ -17,6 +17,12 @@ FRONTEND/.angular/
 .idea/
 .DS_Store
 Thumbs.db
+BACKEND/.vs/
 
 # Logs
 *.log
+
+# Notas de contexto / avance (no forman parte del proyecto)
+Avance del Proyecto.txt
+Contexto del Proyecto.txt
+SIRA_CONTEXT.md

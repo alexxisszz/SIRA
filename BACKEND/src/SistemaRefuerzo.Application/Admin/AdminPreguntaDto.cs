@@ -8,5 +8,9 @@ public record AdminPreguntaDto(
     Guid Id,
     Guid TemaId,
     string Enunciado,
+    string Subtema,
     NivelDesempeno NivelDificultad,
+    TipoPregunta Tipo,
+    string? Explicacion,
+    int Puntaje,
     List<AdminOpcionDto> Opciones);

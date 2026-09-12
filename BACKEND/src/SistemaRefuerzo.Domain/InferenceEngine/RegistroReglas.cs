@@ -15,6 +15,9 @@ public static class RegistroReglas
         [nameof(ReglaNivelIntermedio)] = () => new ReglaNivelIntermedio(),
         [nameof(ReglaNivelAvanzado)] = () => new ReglaNivelAvanzado(),
         [nameof(ReglaRefuerzoTeorico)] = () => new ReglaRefuerzoTeorico(),
+        [nameof(ReglaAnalisisSubtemas)] = () => new ReglaAnalisisSubtemas(),
+        [nameof(ReglaSubirDificultadPorSubtema)] = () => new ReglaSubirDificultadPorSubtema(),
+        [nameof(ReglaBajarDificultadPorSubtema)] = () => new ReglaBajarDificultadPorSubtema(),
     };
 
     public static IRegla Resolver(string nombreClaseRegla)

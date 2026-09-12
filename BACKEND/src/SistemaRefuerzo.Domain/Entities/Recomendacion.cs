@@ -5,6 +5,7 @@ namespace SistemaRefuerzo.Domain.Entities;
 public class Recomendacion
 {
     private readonly List<string> _temasPorReforzar = [];
+    private readonly List<string> _subtemasDominados = [];
     private readonly List<EjercicioRecomendado> _ejerciciosRecomendados = [];
 
     public Guid Id { get; private set; }
@@ -13,11 +14,17 @@ public class Recomendacion
     public string Retroalimentacion { get; private set; } = null!;
     public DateTime FechaGeneracion { get; private set; }
     public IReadOnlyCollection<string> TemasPorReforzar => _temasPorReforzar.AsReadOnly();
+    public IReadOnlyCollection<string> SubtemasDominados => _subtemasDominados.AsReadOnly();
     public IReadOnlyCollection<EjercicioRecomendado> EjerciciosRecomendados => _ejerciciosRecomendados.AsReadOnly();
 
     private Recomendacion() { }
 
-    public Recomendacion(Guid resultadoId, NivelDesempeno nivel, string retroalimentacion, IEnumerable<string> temasPorReforzar)
+    public Recomendacion(
+        Guid resultadoId,
+        NivelDesempeno nivel,
+        string retroalimentacion,
+        IEnumerable<string> temasPorReforzar,
+        IEnumerable<string> subtemasDominados)
     {
         Id = Guid.NewGuid();
         ResultadoId = resultadoId;
@@ -25,6 +32,7 @@ public class Recomendacion
         Retroalimentacion = retroalimentacion;
         FechaGeneracion = DateTime.UtcNow;
         _temasPorReforzar.AddRange(temasPorReforzar);
+        _subtemasDominados.AddRange(subtemasDominados);
     }
 
     public void AgregarEjercicioRecomendado(Guid preguntaId)

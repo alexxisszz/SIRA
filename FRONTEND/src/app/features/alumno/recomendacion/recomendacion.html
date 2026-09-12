@@ -11,31 +11,131 @@
   </div>
 
   <div class="card mb-3">
+    <div class="card-body text-center">
+      <p class="text-muted mb-1 small">Nota obtenida</p>
+      <p class="display-6 fw-bold mb-0">{{ notaVigesimal() }}<span class="fs-4 text-muted">/20</span></p>
+    </div>
+  </div>
+
+  <div class="card mb-3">
     <div class="card-body">
       <h2 class="h6">Retroalimentación</h2>
       <p class="mb-3">{{ recomendacion()!.retroalimentacion }}</p>
 
       @if (recomendacion()!.temasPorReforzar.length > 0) {
-        <p class="fw-medium mb-1">Temas por reforzar:</p>
+        <p class="fw-medium mb-1">Subtemas por reforzar:</p>
         <ul>
           @for (tema of recomendacion()!.temasPorReforzar; track tema) {
             <li>{{ tema }}</li>
           }
         </ul>
       }
+
+      @if (recomendacion()!.subtemasDominados.length > 0) {
+        <p class="fw-medium mb-1">Subtemas que ya dominas:</p>
+        <ul>
+          @for (subtema of recomendacion()!.subtemasDominados; track subtema) {
+            <li>{{ subtema }}</li>
+          }
+        </ul>
+      }
     </div>
   </div>
+
+  @if (recomendacion()!.respuestasDetalle.length > 0) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Detalle de tus respuestas</h2>
+        @for (respuesta of recomendacion()!.respuestasDetalle; track respuesta.preguntaId) {
+          <div class="border-bottom pb-2 mb-2">
+            <p class="mb-1">
+              <i
+                class="bi"
+                [class.bi-check-circle-fill]="respuesta.esCorrecta"
+                [class.text-success]="respuesta.esCorrecta"
+                [class.bi-x-circle-fill]="!respuesta.esCorrecta"
+                [class.text-danger]="!respuesta.esCorrecta"
+              ></i>
+              {{ respuesta.enunciado }}
+            </p>
+            <p class="small mb-0 ms-4">
+              Tu respuesta: <span [class.text-danger]="!respuesta.esCorrecta">{{ respuesta.opcionSeleccionadaTexto }}</span>
+              @if (!respuesta.esCorrecta) {
+                · Correcta: <span class="text-success">{{ respuesta.opcionCorrectaTexto }}</span>
+              }
+            </p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (recomendacion()!.reporteProgreso; as reporte) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Tu progreso en este tema</h2>
+
+        <div class="row text-center mb-3">
+          <div class="col-6">
+            <p class="text-muted small mb-1">Prueba de entrada</p>
+            <p class="fs-4 fw-bold mb-0">{{ vigesimal(reporte.puntajeInicial) }}<span class="fs-6 text-muted">/20</span></p>
+            @if (reporte.nivelInicial !== null) {
+              <span class="badge" [class]="claseNivel(reporte.nivelInicial)">{{ etiquetaNivel(reporte.nivelInicial) }}</span>
+            }
+          </div>
+          <div class="col-6">
+            <p class="text-muted small mb-1">Prueba final</p>
+            <p class="fs-4 fw-bold mb-0">{{ vigesimal(reporte.puntajeFinal) }}<span class="fs-6 text-muted">/20</span></p>
+            <span class="badge" [class]="claseNivel(reporte.nivelFinal)">{{ etiquetaNivel(reporte.nivelFinal) }}</span>
+          </div>
+        </div>
+
+        @if (reporte.subtemas.length > 0) {
+          <p class="fw-medium mb-2 small">Evolución por subtema</p>
+          <ul class="list-unstyled mb-0 small">
+            @for (item of reporte.subtemas; track item.subtema) {
+              <li class="d-flex justify-content-between align-items-center mb-1">
+                <span>{{ item.subtema }}</span>
+                <span>
+                  {{ item.porcentajeInicial }}% → {{ item.porcentajeFinal }}%
+                  @if (item.porcentajeFinal > item.porcentajeInicial) {
+                    <i class="bi bi-arrow-up-circle-fill text-success"></i>
+                  } @else if (item.porcentajeFinal < item.porcentajeInicial) {
+                    <i class="bi bi-arrow-down-circle-fill text-danger"></i>
+                  } @else {
+                    <i class="bi bi-dash-circle-fill text-muted"></i>
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
 
   @if (recomendacion()!.ejerciciosSugeridos.length > 0) {
     <div class="card">
       <div class="card-body">
         <h2 class="h6">Ejercicios sugeridos</h2>
-        <ul class="list-group list-group-flush">
+        <ul class="list-group list-group-flush mb-3">
           @for (ejercicio of recomendacion()!.ejerciciosSugeridos; track ejercicio.id) {
             <li class="list-group-item">{{ ejercicio.titulo }}</li>
           }
         </ul>
+        <a
+          class="btn btn-primary btn-sm"
+          routerLink="/practicar"
+          [queryParams]="{ preguntas: idsEjerciciosSugeridos(), temaId: recomendacion()!.temaId, nivel: recomendacion()!.nivel }"
+        >
+          Practicar estos ejercicios
+        </a>
       </div>
     </div>
   }
+
+  <div class="d-flex gap-2 mt-3">
+    <button type="button" class="btn btn-primary" routerLink="/temas">Volver a temas</button>
+    <button type="button" class="btn btn-outline-secondary" routerLink="/historial">Ver mi historial</button>
+  </div>
 }

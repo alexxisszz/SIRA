@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { RecomendacionService } from '../services/recomendacion.service';
 import { NivelDesempeno, Recomendacion as RecomendacionModel } from '../models/recomendacion.model';
 import { CLASE_NIVEL, ETIQUETA_NIVEL } from '../../../shared/utils/nivel.util';
+import { convertirAVigesimal } from '../../../shared/utils/calificacion.util';
 
 @Component({
   selector: 'app-recomendacion',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './recomendacion.html',
 })
 export class Recomendacion {
@@ -38,5 +39,17 @@ export class Recomendacion {
 
   claseNivel(nivel: NivelDesempeno): string {
     return CLASE_NIVEL[nivel];
+  }
+
+  notaVigesimal(): number {
+    return convertirAVigesimal(this.recomendacion()!.puntaje);
+  }
+
+  vigesimal(puntaje: number): number {
+    return convertirAVigesimal(puntaje);
+  }
+
+  idsEjerciciosSugeridos(): string {
+    return this.recomendacion()!.ejerciciosSugeridos.map((e) => e.id).join(',');
   }
 }

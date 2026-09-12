@@ -17,7 +17,15 @@ public class CrearPreguntaCommandHandler(
         var tema = await temaRepository.ObtenerPorIdAsync(request.TemaId, cancellationToken)
             ?? throw new NotFoundException(nameof(Tema), request.TemaId);
 
-        var pregunta = new Pregunta(tema.Id, request.Enunciado, request.NivelDificultad);
+        var pregunta = new Pregunta(
+            tema.Id,
+            request.Enunciado,
+            request.NivelDificultad,
+            request.Subtema,
+            request.Tipo,
+            request.Explicacion,
+            request.Puntaje);
+
         foreach (var opcion in request.Opciones)
             pregunta.AgregarOpcion(opcion.Texto, opcion.EsCorrecta);
 

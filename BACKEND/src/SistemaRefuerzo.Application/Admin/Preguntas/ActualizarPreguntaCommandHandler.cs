@@ -19,6 +19,10 @@ public class ActualizarPreguntaCommandHandler(
         pregunta.ActualizarContenido(
             request.Enunciado,
             request.NivelDificultad,
+            request.Subtema,
+            request.Tipo,
+            request.Explicacion,
+            request.Puntaje,
             request.Opciones.Select(o => (o.Texto, o.EsCorrecta)));
 
         await unitOfWork.GuardarCambiosAsync(cancellationToken);

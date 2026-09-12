@@ -1,4 +1,3 @@
-using SistemaRefuerzo.Application.Common.Interfaces;
 using SistemaRefuerzo.Domain.Entities;
 using SistemaRefuerzo.Domain.Enums;
 using SistemaRefuerzo.Domain.InferenceEngine;
@@ -7,16 +6,18 @@ namespace SistemaRefuerzo.Application.Recomendaciones;
 
 /// <summary>
 /// Traduce las conclusiones dejadas por el Motor de Inferencia en la Base de Hechos
-/// (nivel asignado, necesidad de refuerzo teórico) en una <see cref="Recomendacion"/>
-/// concreta: retroalimentación en lenguaje natural, temas a reforzar y ejercicios sugeridos.
+/// (nivel asignado, necesidad de refuerzo teórico, subtemas dominados y con dificultad)
+/// en una <see cref="Recomendacion"/> concreta: retroalimentación en lenguaje natural
+/// y ejercicios sugeridos de los subtemas donde el alumno mostró dificultad.
 /// </summary>
-public class GeneradorDeRecomendacion(IPreguntaRepository preguntaRepository)
+public class GeneradorDeRecomendacion
 {
     private const int MaximoEjerciciosSugeridos = 5;
 
-    public async Task<Recomendacion> GenerarAsync(
+    public Task<Recomendacion> GenerarAsync(
         Resultado resultado,
         Tema tema,
+        IReadOnlyDictionary<Guid, Pregunta> preguntasDelTema,
         BaseDeHechos hechos,
         CancellationToken cancellationToken)
     {
@@ -24,24 +25,38 @@ public class GeneradorDeRecomendacion(IPreguntaRepository preguntaRepository)
         var requiereRefuerzoTeorico = hechos.Contiene(ClavesHechos.RequiereRefuerzoTeorico)
             && hechos.Obtener<bool>(ClavesHechos.RequiereRefuerzoTeorico);
 
-        var temasPorReforzar = new List<string>();
-        if (nivel == NivelDesempeno.Basico || requiereRefuerzoTeorico)
+        var subtemasConDificultad = hechos.Contiene(ClavesHechos.SubtemasConDificultad)
+            ? hechos.Obtener<List<string>>(ClavesHechos.SubtemasConDificultad)
+            : [];
+        var subtemasDominados = hechos.Contiene(ClavesHechos.SubtemasDominados)
+            ? hechos.Obtener<List<string>>(ClavesHechos.SubtemasDominados)
+            : [];
+
+        var temasPorReforzar = new List<string>(subtemasConDificultad);
+        if (temasPorReforzar.Count == 0 && (nivel == NivelDesempeno.Basico || requiereRefuerzoTeorico))
             temasPorReforzar.Add(tema.Nombre);
 
         var recomendacion = new Recomendacion(
             resultado.Id,
             nivel,
-            ConstruirRetroalimentacion(nivel, requiereRefuerzoTeorico),
-            temasPorReforzar);
+            ConstruirRetroalimentacion(nivel, requiereRefuerzoTeorico, subtemasConDificultad, subtemasDominados),
+            temasPorReforzar,
+            subtemasDominados);
 
-        var ejerciciosSugeridos = await preguntaRepository.ObtenerPorTemaYNivelAsync(tema.Id, nivel, cancellationToken);
-        foreach (var ejercicio in ejerciciosSugeridos.Take(MaximoEjerciciosSugeridos))
+        var ejerciciosCandidatos = preguntasDelTema.Values.Where(p => p.NivelDificultad == nivel).ToList();
+        var subtemasSet = subtemasConDificultad.ToHashSet();
+        var ejerciciosPriorizados = ejerciciosCandidatos.Where(p => subtemasSet.Contains(p.Subtema)).ToList();
+        if (ejerciciosPriorizados.Count > 0)
+            ejerciciosCandidatos = ejerciciosPriorizados;
+
+        foreach (var ejercicio in ejerciciosCandidatos.Take(MaximoEjerciciosSugeridos))
             recomendacion.AgregarEjercicioRecomendado(ejercicio.Id);
 
-        return recomendacion;
+        return Task.FromResult(recomendacion);
     }
 
-    private static string ConstruirRetroalimentacion(NivelDesempeno nivel, bool requiereRefuerzoTeorico)
+    private static string ConstruirRetroalimentacion(
+        NivelDesempeno nivel, bool requiereRefuerzoTeorico, List<string> subtemasConDificultad, List<string> subtemasDominados)
     {
         var mensaje = nivel switch
         {
@@ -53,6 +68,12 @@ public class GeneradorDeRecomendacion(IPreguntaRepository preguntaRepository)
 
         if (requiereRefuerzoTeorico)
             mensaje += " Además, al fallar varias preguntas seguidas, te recomendamos repasar la teoría antes de continuar.";
+
+        if (subtemasConDificultad.Count > 0)
+            mensaje += $" Presta especial atención a: {string.Join(", ", subtemasConDificultad)}.";
+
+        if (subtemasDominados.Count > 0)
+            mensaje += $" Ya dominas: {string.Join(", ", subtemasDominados)}.";
 
         return mensaje;
     }

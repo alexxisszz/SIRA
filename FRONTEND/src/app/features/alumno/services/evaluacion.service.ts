@@ -5,15 +5,26 @@ import { environment } from '../../../../environments/environment';
 import {
   FinalizarEvaluacionResponse,
   IniciarEvaluacionResponse,
+  Pregunta,
   RegistrarRespuestaRequest,
+  TipoEvaluacion,
 } from '../models/evaluacion.model';
+import { NivelDesempeno } from '../models/recomendacion.model';
 
 @Injectable({ providedIn: 'root' })
 export class EvaluacionService {
   private readonly http = inject(HttpClient);
 
-  iniciar(temaId: string): Observable<IniciarEvaluacionResponse> {
-    return this.http.post<IniciarEvaluacionResponse>(`${environment.apiUrl}/evaluaciones`, { temaId });
+  iniciar(temaId: string, tipo: TipoEvaluacion, nivel?: NivelDesempeno): Observable<IniciarEvaluacionResponse> {
+    return this.http.post<IniciarEvaluacionResponse>(`${environment.apiUrl}/evaluaciones`, {
+      temaId,
+      tipo,
+      nivel: nivel ?? null,
+    });
+  }
+
+  obtenerPreguntas(evaluacionId: string): Observable<Pregunta[]> {
+    return this.http.get<Pregunta[]>(`${environment.apiUrl}/evaluaciones/${evaluacionId}/preguntas`);
   }
 
   registrarRespuesta(evaluacionId: string, respuesta: RegistrarRespuestaRequest): Observable<void> {

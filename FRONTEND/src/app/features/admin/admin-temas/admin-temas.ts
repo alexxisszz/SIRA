@@ -79,4 +79,12 @@ export class AdminTemas {
   verPreguntas(tema: AdminTema): void {
     this.router.navigate(['/admin/temas', tema.id, 'preguntas']);
   }
+
+  verVideos(tema: AdminTema): void {
+    this.router.navigate(['/admin/temas', tema.id, 'videos']);
+  }
+
+  verTeoria(tema: AdminTema): void {
+    this.router.navigate(['/admin/temas', tema.id, 'teoria']);
+  }
 }

@@ -11,5 +11,8 @@ public class RecomendacionRepository(AppDbContext dbContext) : IRecomendacionRep
             .Include(r => r.EjerciciosRecomendados)
             .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
 
+    public Task<Recomendacion?> ObtenerPorResultadoIdAsync(Guid resultadoId, CancellationToken cancellationToken) =>
+        dbContext.Recomendaciones.FirstOrDefaultAsync(r => r.ResultadoId == resultadoId, cancellationToken);
+
     public void Agregar(Recomendacion recomendacion) => dbContext.Recomendaciones.Add(recomendacion);
 }

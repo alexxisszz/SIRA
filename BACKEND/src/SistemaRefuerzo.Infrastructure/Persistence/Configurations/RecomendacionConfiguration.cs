@@ -26,6 +26,17 @@ public class RecomendacionConfiguration : IEntityTypeConfiguration<Recomendacion
                 a => a.Aggregate(0, (hash, texto) => HashCode.Combine(hash, texto)),
                 a => a.ToList()));
 
+        builder.Property(r => r.SubtemasDominados)
+            .HasField("_subtemasDominados")
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasConversion(
+                subtemas => string.Join('|', subtemas),
+                texto => texto.Split('|', StringSplitOptions.RemoveEmptyEntries).ToList())
+            .Metadata.SetValueComparer(new ValueComparer<IReadOnlyCollection<string>>(
+                (a, b) => a!.SequenceEqual(b!),
+                a => a.Aggregate(0, (hash, texto) => HashCode.Combine(hash, texto)),
+                a => a.ToList()));
+
         builder.HasMany(r => r.EjerciciosRecomendados)
             .WithOne()
             .HasForeignKey(e => e.RecomendacionId)

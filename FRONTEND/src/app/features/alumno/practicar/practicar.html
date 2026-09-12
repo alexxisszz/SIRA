@@ -1,0 +1,100 @@
+@if (error() && !ejercicio()) {
+  <div class="alert alert-danger">No se pudo cargar la práctica.</div>
+  <button type="button" class="btn btn-outline-secondary" routerLink="/temas">Volver a temas</button>
+} @else if (terminado()) {
+  <div class="practicar__resumen">
+    <h1 class="h4">¡Práctica terminada!</h1>
+    <p class="display-6 fw-bold">{{ aciertos() }}/{{ total() }}</p>
+    <p class="text-muted">ejercicios resueltos correctamente</p>
+
+    @if (sugerirSubirNivel()) {
+      <div class="alert alert-success">
+        <i class="bi bi-stars"></i>
+        ¡Vas muy bien! Podrías intentar rendir la prueba de un nivel más alto.
+      </div>
+    }
+
+    <button type="button" class="btn btn-primary" routerLink="/temas">Volver a temas</button>
+  </div>
+} @else {
+  <div class="practicar">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <p class="text-muted small mb-0">Ejercicio {{ indice() + 1 }} de {{ total() }}</p>
+      @if (nivelActual() !== null) {
+        <span class="badge text-bg-secondary">Nivel {{ etiquetaNivel(nivelActual()!) }}</span>
+      }
+    </div>
+
+    @if (mensajeCambioNivel(); as mensaje) {
+      <div class="alert alert-info small">
+        <i class="bi bi-arrow-repeat"></i>
+        {{ mensaje }}
+      </div>
+    }
+
+    @if (cargando()) {
+      <p class="text-muted">Cargando ejercicio...</p>
+    } @else if (ejercicio(); as pregunta) {
+      <article class="card practicar__card">
+        <div class="card-body">
+          <p class="fw-medium mb-3">{{ pregunta.enunciado }}</p>
+
+          <div class="d-flex flex-column gap-2 mb-3">
+            @for (opcion of pregunta.opciones; track opcion.id; let opcionIndice = $index) {
+              <label
+                class="practicar__opcion"
+                [class.practicar__opcion--seleccionada]="opcionSeleccionada() === opcion.id"
+                [class.practicar__opcion--correcta]="resultado() && opcion.id === resultado()!.opcionCorrectaId"
+                [class.practicar__opcion--incorrecta]="
+                  resultado() && !resultado()!.esCorrecta && opcionSeleccionada() === opcion.id && opcion.id !== resultado()!.opcionCorrectaId
+                "
+              >
+                <input
+                  type="radio"
+                  name="opcion"
+                  [checked]="opcionSeleccionada() === opcion.id"
+                  [disabled]="resultado() !== null"
+                  (change)="seleccionarOpcion(opcion.id)"
+                />
+                <span>{{ letraOpcion(opcionIndice) }}) {{ opcion.texto }}</span>
+              </label>
+            }
+          </div>
+
+          @if (resultado(); as res) {
+            <div class="alert" [class.alert-success]="res.esCorrecta" [class.alert-danger]="!res.esCorrecta">
+              <p class="fw-medium mb-1">{{ res.esCorrecta ? '¡Correcto!' : 'Incorrecto' }}</p>
+              @if (res.explicacion) {
+                <p class="mb-0 small">{{ res.explicacion }}</p>
+              }
+            </div>
+
+            @if (teoriaSubtema(); as teoria) {
+              <div class="card practicar__teoria mb-3">
+                <div class="card-body">
+                  <p class="fw-medium mb-2"><i class="bi bi-book"></i> {{ teoria.titulo }}</p>
+                  @for (parrafo of teoria.parrafos; track parrafo) {
+                    <p class="small text-muted mb-1">{{ parrafo }}</p>
+                  }
+                </div>
+              </div>
+            }
+
+            <button type="button" class="btn btn-primary" (click)="siguienteEjercicio()">
+              {{ indice() + 1 < total() ? 'Siguiente ejercicio' : 'Ver resumen' }}
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="!opcionSeleccionada() || enviando()"
+              (click)="enviarRespuesta()"
+            >
+              {{ enviando() ? 'Enviando...' : 'Comprobar respuesta' }}
+            </button>
+          }
+        </div>
+      </article>
+    }
+  </div>
+}

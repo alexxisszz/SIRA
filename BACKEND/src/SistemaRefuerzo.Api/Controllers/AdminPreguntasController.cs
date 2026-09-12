@@ -8,8 +8,23 @@ using SistemaRefuerzo.Domain.Enums;
 namespace SistemaRefuerzo.Api.Controllers;
 
 public record OpcionRequest(string Texto, bool EsCorrecta);
-public record CrearPreguntaRequest(Guid TemaId, string Enunciado, NivelDesempeno NivelDificultad, List<OpcionRequest> Opciones);
-public record ActualizarPreguntaRequest(string Enunciado, NivelDesempeno NivelDificultad, List<OpcionRequest> Opciones);
+public record CrearPreguntaRequest(
+    Guid TemaId,
+    string Enunciado,
+    string Subtema,
+    NivelDesempeno NivelDificultad,
+    TipoPregunta Tipo,
+    string? Explicacion,
+    int Puntaje,
+    List<OpcionRequest> Opciones);
+public record ActualizarPreguntaRequest(
+    string Enunciado,
+    string Subtema,
+    NivelDesempeno NivelDificultad,
+    TipoPregunta Tipo,
+    string? Explicacion,
+    int Puntaje,
+    List<OpcionRequest> Opciones);
 
 [ApiController]
 [Authorize(Roles = "Administrador")]
@@ -30,7 +45,11 @@ public class AdminPreguntasController(ISender sender) : ControllerBase
             new CrearPreguntaCommand(
                 request.TemaId,
                 request.Enunciado,
+                request.Subtema,
                 request.NivelDificultad,
+                request.Tipo,
+                request.Explicacion,
+                request.Puntaje,
                 request.Opciones.Select(o => new OpcionInput(o.Texto, o.EsCorrecta)).ToList()),
             cancellationToken);
 
@@ -44,7 +63,11 @@ public class AdminPreguntasController(ISender sender) : ControllerBase
             new ActualizarPreguntaCommand(
                 preguntaId,
                 request.Enunciado,
+                request.Subtema,
                 request.NivelDificultad,
+                request.Tipo,
+                request.Explicacion,
+                request.Puntaje,
                 request.Opciones.Select(o => new OpcionInput(o.Texto, o.EsCorrecta)).ToList()),
             cancellationToken);
 

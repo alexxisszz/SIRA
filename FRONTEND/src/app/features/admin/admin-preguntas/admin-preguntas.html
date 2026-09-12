@@ -13,13 +13,37 @@
           <textarea class="form-control" formControlName="enunciado" rows="2"></textarea>
         </div>
 
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label small">Subtema</label>
+            <input type="text" class="form-control" formControlName="subtema" placeholder="Ej. Descuentos" />
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label small">Nivel de dificultad</label>
+            <select class="form-select" formControlName="nivelDificultad">
+              <option [value]="NivelDificultad.Basico">Básico</option>
+              <option [value]="NivelDificultad.Intermedio">Intermedio</option>
+              <option [value]="NivelDificultad.Avanzado">Avanzado</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label small">Tipo de pregunta</label>
+            <select class="form-select" formControlName="tipo">
+              <option [value]="TipoPregunta.OpcionMultiple">Opción múltiple</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label small">Puntaje</label>
+            <input type="number" class="form-control" formControlName="puntaje" min="1" />
+          </div>
+        </div>
+
         <div class="mb-3">
-          <label class="form-label small">Nivel de dificultad</label>
-          <select class="form-select" formControlName="nivelDificultad">
-            <option [value]="NivelDificultad.Basico">Básico</option>
-            <option [value]="NivelDificultad.Intermedio">Intermedio</option>
-            <option [value]="NivelDificultad.Avanzado">Avanzado</option>
-          </select>
+          <label class="form-label small">Explicación (retroalimentación al alumno)</label>
+          <textarea class="form-control" formControlName="explicacion" rows="2"></textarea>
         </div>
 
         <label class="form-label small">Opciones (marca la correcta)</label>
@@ -67,7 +91,11 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
           <p class="fw-medium mb-0">{{ pregunta.enunciado }}</p>
-          <span class="badge text-bg-secondary">{{ etiquetaNivel[pregunta.nivelDificultad] }}</span>
+          <div class="d-flex gap-1">
+            <span class="badge text-bg-secondary">{{ pregunta.subtema }}</span>
+            <span class="badge text-bg-secondary">{{ etiquetaNivel[pregunta.nivelDificultad] }}</span>
+            <span class="badge text-bg-light border">{{ pregunta.puntaje }} pt</span>
+          </div>
         </div>
         <ul class="list-unstyled mb-3 small">
           @for (opcion of pregunta.opciones; track opcion.id) {
@@ -76,6 +104,9 @@
             </li>
           }
         </ul>
+        @if (pregunta.explicacion) {
+          <p class="small text-muted mb-3"><strong>Explicación:</strong> {{ pregunta.explicacion }}</p>
+        }
         <button type="button" class="btn btn-outline-secondary btn-sm me-2" (click)="abrirEditar(pregunta)">
           Editar
         </button>
