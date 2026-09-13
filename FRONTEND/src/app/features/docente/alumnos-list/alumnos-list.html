@@ -1,41 +1,45 @@
-<h1 class="h4 mb-1">Mis alumnos</h1>
-<p class="text-muted mb-4">Progreso general por alumno</p>
-
-@if (cargando()) {
-  <p class="text-muted">Cargando alumnos...</p>
-} @else if (error()) {
-  <div class="alert alert-danger">No se pudo cargar la lista de alumnos.</div>
-} @else if (alumnos().length === 0) {
-  <p class="text-muted">Aún no hay evaluaciones registradas.</p>
-} @else {
-  <table class="table table-hover align-middle">
-    <thead>
-      <tr>
-        <th>Alumno</th>
-        <th>Grado</th>
-        <th>Evaluaciones</th>
-        <th>Último nivel</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (alumno of alumnos(); track alumno.alumnoId) {
-        <tr style="cursor: pointer;" (click)="verDetalle(alumno.alumnoId)">
-          <td>{{ alumno.apellidos }}, {{ alumno.nombres }}</td>
-          <td>{{ alumno.grado }}</td>
-          <td>{{ alumno.evaluacionesRealizadas }}</td>
-          <td>
-            @if (alumno.ultimoNivel !== null) {
-              <span class="badge" [class]="claseNivel(alumno.ultimoNivel)">
-                {{ etiquetaNivel(alumno.ultimoNivel) }}
-              </span>
-            } @else {
-              <span class="text-muted">Sin evaluar</span>
-            }
-          </td>
-          <td class="text-end text-muted">Ver detalle →</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+<section class="alumnos-page__heading">
+  <div>
+    <h1>Mis alumnos</h1>
+    <p>Visualiza el progreso y desempeno de tus estudiantes @if (temaSeleccionadoNombre()) { en {{ temaSeleccionadoNombre() }} }</p>
+  </div>
+  @if (temas().length > 0) {
+    <select class="alumnos-page__topic-select" [ngModel]="temaSeleccionadoId()" (ngModelChange)="cambiarTema($event)">
+      @for (tema of temas(); track tema.id) { <option [value]="tema.id">{{ tema.nombre }}</option> }
+    </select>
+  }
+</section>
+@if (cargando()) { <p class="text-muted">Cargando alumnos...</p> }
+@else if (error()) { <div class="alert alert-danger">No se pudo cargar la lista de alumnos.</div> }
+@else {
+  @if (resumen(); as resumen) {
+    <div class="alumnos-page__stats">
+      <div class="alumnos-stat alumnos-stat--blue"><div class="alumnos-stat__icon"><i class="bi bi-people-fill"></i></div><div><strong>{{ resumen.totalEstudiantes }}</strong><span>Estudiantes</span><small>3ro de Secundaria</small></div></div>
+      <div class="alumnos-stat alumnos-stat--green"><div class="alumnos-stat__icon"><i class="bi bi-check-lg"></i></div><div><strong>{{ resumen.avancePromedio | number: '1.0-0' }}%</strong><span>Avance promedio</span><small>En {{ temaSeleccionadoNombre() || 'Porcentajes I' }}</small></div></div>
+      <div class="alumnos-stat alumnos-stat--purple"><div class="alumnos-stat__icon"><i class="bi bi-bar-chart-fill"></i></div><div><strong>{{ notaVigesimal(resumen.promedioGeneral) }}/20</strong><span>Promedio general</span><small>Rendimiento del grupo</small></div></div>
+      <div class="alumnos-stat alumnos-stat--red"><div class="alumnos-stat__icon"><i class="bi bi-exclamation-lg"></i></div><div><strong>{{ resumen.estudiantesRequierenApoyo }}</strong><span>Requieren apoyo</span><small>{{ porcentajeRequierenApoyo() | number: '1.0-0' }}% del grupo</small></div></div>
+    </div>
+  }
+  <div class="alumnos-page__filters">
+    <label class="alumnos-page__search"><i class="bi bi-search"></i><input type="search" aria-label="Buscar estudiante por nombre" placeholder="Buscar estudiante por nombre..." [ngModel]="busqueda()" (ngModelChange)="busqueda.set($event)" /></label>
+    <select aria-label="Filtrar por grado" [ngModel]="filtroGrado()" (ngModelChange)="filtroGrado.set($event)"><option value="">Todos los grados</option>@for (grado of grados(); track grado) { <option [value]="grado">{{ grado }}</option> }</select>
+    <select aria-label="Filtrar por nivel" [ngModel]="filtroNivel()" (ngModelChange)="filtroNivel.set($event)"><option value="">Todos los niveles</option><option value="0">Basico</option><option value="1">Intermedio</option><option value="2">Avanzado</option></select>
+    <select aria-label="Filtrar por estado" [ngModel]="filtroEstado()" (ngModelChange)="filtroEstado.set($event)"><option value="">Todos los estados</option><option value="Sin evaluar">Sin evaluar</option><option value="En progreso">En progreso</option><option value="Requiere apoyo">Requiere apoyo</option><option value="Buen progreso">Buen progreso</option></select>
+  </div>
+  @if (alumnosFiltrados().length === 0) { <p class="text-muted alumnos-empty">No se encontraron alumnos con los filtros seleccionados.</p> }
+  @else {
+    <section class="alumnos-table-card"><div class="table-responsive"><table class="table align-middle alumnos-table"><thead><tr>
+      <th><button type="button" (click)="ordenarPor('alumno')">Alumno <span>↕</span></button></th><th><button type="button" (click)="ordenarPor('grado')">Grado <span>↕</span></button></th><th><button type="button" (click)="ordenarPor('progreso')">Progreso <span>↕</span></button></th><th><button type="button" (click)="ordenarPor('nivel')">Nivel actual <span>↕</span></button></th><th><button type="button" (click)="ordenarPor('ultimoResultado')">Ultimo resultado <span>↕</span></button></th><th><button type="button" (click)="ordenarPor('estado')">Estado <span>↕</span></button></th><th><button type="button" (click)="ordenarPor('ultimaActividad')">Ultima actividad <span>↕</span></button></th><th>Accion</th>
+    </tr></thead><tbody>
+      @for (alumno of alumnosPagina(); track alumno.alumnoId) { <tr>
+        <td><div class="alumnos-table__person"><span class="alumnos-table__avatar">{{ iniciales(alumno) }}</span><strong>{{ alumno.apellidos }}, {{ alumno.nombres }}</strong></div></td><td>{{ alumno.grado }}</td>
+        <td><div class="alumnos-table__progress"><div class="progress"><div class="progress-bar" [style.width.%]="alumno.porcentajeAvance"></div></div><span>{{ alumno.porcentajeAvance | number: '1.0-0' }}%</span></div></td>
+        <td>@if (alumno.nivelActual !== null) { <span class="badge" [class]="claseNivel(alumno.nivelActual)">{{ etiquetaNivel(alumno.nivelActual) }}</span> } @else { <span class="badge alumnos-badge--neutral">Sin evaluar</span> }</td>
+        <td>@if (alumno.ultimoPuntaje !== null) { {{ notaVigesimal(alumno.ultimoPuntaje) }}/20 } @else { <span class="text-muted">-</span> }</td><td><span class="badge" [class]="claseEstado(alumno.estado)"><i></i>{{ alumno.estado }}</span></td>
+        <td class="alumnos-table__date">@if (alumno.ultimaEvaluacion) { {{ alumno.ultimaEvaluacion | date: 'dd/MM/yyyy' }} } @else { - }</td><td><button type="button" class="alumnos-detail-button" (click)="verDetalle(alumno.alumnoId)">Ver detalle <span>→</span></button></td>
+      </tr> }
+    </tbody></table></div>
+    <footer class="alumnos-table__footer"><span>Mostrando {{ alumnosPagina().length }} de {{ alumnosFiltrados().length }} estudiantes</span>@if (totalPaginas() > 1) { <div class="alumnos-pagination"><button type="button" [disabled]="pagina() === 1" (click)="irAPagina(pagina() - 1)">‹</button>@for (n of [].constructor(totalPaginas()); track $index) { <button type="button" [class.active]="pagina() === $index + 1" (click)="irAPagina($index + 1)">{{ $index + 1 }}</button> }<button type="button" [disabled]="pagina() === totalPaginas()" (click)="irAPagina(pagina() + 1)">›</button></div> }</footer>
+    </section>
+  }
 }

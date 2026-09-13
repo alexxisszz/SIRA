@@ -2,4 +2,4 @@ using MediatR;
 
 namespace SistemaRefuerzo.Application.Reportes.Docente;
 
-public record ObtenerResumenAlumnosQuery : IRequest<List<AlumnoResumenDto>>;
+public record ObtenerResumenAlumnosQuery(Guid? TemaId = null) : IRequest<List<AlumnoResumenDto>>;

@@ -9,7 +9,9 @@ namespace SistemaRefuerzo.Application.Common.Interfaces;
 /// </summary>
 public interface IDocenteQueryRepository
 {
-    Task<List<AlumnoResumenDto>> ObtenerResumenAlumnosAsync(CancellationToken cancellationToken);
+    Task<List<AlumnoResumenDto>> ObtenerResumenAlumnosAsync(Guid? temaId, CancellationToken cancellationToken);
     Task<List<ResultadoHistoricoDto>> ObtenerResultadosPorAlumnoAsync(Guid alumnoId, CancellationToken cancellationToken);
     Task<EstadisticasDto> ObtenerEstadisticasAsync(CancellationToken cancellationToken);
+    Task<ResumenGrupoDto> ObtenerResumenGrupoAsync(Guid? temaId, CancellationToken cancellationToken);
+    Task<PerfilRendimientoAlumnoDto> ObtenerPerfilAlumnoAsync(Guid alumnoId, CancellationToken cancellationToken);
 }

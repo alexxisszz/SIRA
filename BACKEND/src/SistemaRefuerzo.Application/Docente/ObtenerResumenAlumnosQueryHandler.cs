@@ -7,5 +7,5 @@ public class ObtenerResumenAlumnosQueryHandler(IDocenteQueryRepository docenteQu
     : IRequestHandler<ObtenerResumenAlumnosQuery, List<AlumnoResumenDto>>
 {
     public Task<List<AlumnoResumenDto>> Handle(ObtenerResumenAlumnosQuery request, CancellationToken cancellationToken) =>
-        docenteQueryRepository.ObtenerResumenAlumnosAsync(cancellationToken);
+        docenteQueryRepository.ObtenerResumenAlumnosAsync(request.TemaId, cancellationToken);
 }

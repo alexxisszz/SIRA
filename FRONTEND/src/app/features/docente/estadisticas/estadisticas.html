@@ -1,48 +1,199 @@
-<h1 class="h4 mb-4">Estadísticas generales</h1>
+<h1 class="h4 mb-1">Panel del grupo</h1>
+<p class="text-muted mb-4">Cómo va el grupo, quién necesita apoyo y en qué están fallando</p>
 
 @if (cargando()) {
-  <p class="text-muted">Cargando estadísticas...</p>
-} @else if (error() || !estadisticas()) {
-  <div class="alert alert-danger">No se pudieron cargar las estadísticas.</div>
+  <p class="text-muted">Cargando panel...</p>
+} @else if (error() || !resumen()) {
+  <div class="alert alert-danger">No se pudo cargar el panel del grupo.</div>
 } @else {
-  <div class="row mb-4">
-    <div class="col-6">
-      <div class="card text-center">
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card text-center h-100">
         <div class="card-body">
-          <p class="text-muted mb-1 small">Evaluaciones totales</p>
-          <p class="h3 mb-0">{{ estadisticas()!.totalEvaluaciones }}</p>
+          <p class="text-muted mb-1 small">Estudiantes</p>
+          <p class="h3 mb-0">{{ resumen()!.totalEstudiantes }}</p>
         </div>
       </div>
     </div>
-    <div class="col-6">
-      <div class="card text-center">
+    <div class="col-6 col-md-3">
+      <div class="card text-center h-100">
         <div class="card-body">
-          <p class="text-muted mb-1 small">Nota promedio</p>
-          <p class="h3 mb-0">{{ notaVigesimal(estadisticas()!.puntajePromedioGeneral) }}/20</p>
+          <p class="text-muted mb-1 small">Promedio del grupo</p>
+          <p class="h3 mb-0">{{ notaVigesimal(resumen()!.promedioGeneral) }}/20</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center h-100">
+        <div class="card-body">
+          <p class="text-muted mb-1 small">Avance promedio</p>
+          <p class="h3 mb-0">{{ resumen()!.avancePromedio | number: '1.0-0' }}%</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card text-center h-100" [class.border-danger]="resumen()!.estudiantesRequierenApoyo > 0">
+        <div class="card-body">
+          <p class="text-muted mb-1 small">Requieren apoyo</p>
+          <p class="h3 mb-0" [class.text-danger]="resumen()!.estudiantesRequierenApoyo > 0">
+            {{ resumen()!.estudiantesRequierenApoyo }}
+          </p>
         </div>
       </div>
     </div>
   </div>
 
-  <h2 class="h6 mb-3">Por tema</h2>
-  @for (tema of estadisticas()!.porTema; track tema.temaNombre) {
-    <div class="card mb-3">
-      <div class="card-body">
-        <h3 class="h6">{{ tema.temaNombre }}</h3>
-        <p class="text-muted small mb-2">
-          {{ tema.evaluacionesRealizadas }} evaluaciones · promedio {{ notaVigesimal(tema.puntajePromedio) }}/20
-        </p>
-
-        @if (tema.distribucionNiveles.length > 0) {
-          <div class="d-flex gap-2">
-            @for (nivel of tema.distribucionNiveles; track nivel.nivel) {
-              <span class="badge text-bg-secondary">{{ nivel.nivel }}: {{ nivel.cantidad }}</span>
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Rendimiento del grupo</h2>
+          @if (resumen()!.distribucionNiveles.length === 0) {
+            <p class="text-muted small mb-0">Aún no hay evaluaciones registradas.</p>
+          } @else {
+            @for (nivel of resumen()!.distribucionNiveles; track nivel.nivel) {
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge" [class]="claseNivel(nivel.nivel)" style="width: 6.5rem;">
+                  {{ etiquetaNivel(nivel.nivel) }}
+                </span>
+                <div class="progress flex-grow-1" style="height: 0.5rem;">
+                  <div
+                    class="progress-bar"
+                    [class]="claseNivel(nivel.nivel).replace('text-bg-', 'bg-')"
+                    [style.width.%]="(nivel.cantidad / resumen()!.totalEstudiantes) * 100"
+                  ></div>
+                </div>
+                <span class="text-muted small" style="width: 6.5rem;">{{ nivel.cantidad }} estudiantes</span>
+              </div>
             }
-          </div>
-        } @else {
-          <p class="text-muted small mb-0">Sin evaluaciones registradas.</p>
-        }
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card h-100">
+        <div class="card-body">
+          <h2 class="h6 mb-3">Dificultades del grupo</h2>
+          @if (resumen()!.dificultadesDelGrupo.length === 0) {
+            <p class="text-muted small mb-0">Aún no hay suficientes intentos registrados para detectar patrones.</p>
+          } @else {
+            @for (dificultad of resumen()!.dificultadesDelGrupo; track dificultad.subtema) {
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span>{{ dificultad.subtema }}</span>
+                <span class="text-muted small">{{ dificultad.porcentajeError | number: '1.0-0' }}% de errores</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  @if (resumen()!.alertas.length > 0) {
+    <div class="card mb-4 border-danger-subtle">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Estudiantes que requieren atención</h2>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <tbody>
+              @for (alerta of resumen()!.alertas; track alerta.alumnoId) {
+                <tr>
+                  <td>{{ alerta.apellidos }}, {{ alerta.nombres }}</td>
+                  <td>
+                    @if (alerta.nivelActual !== null) {
+                      <span class="badge" [class]="claseNivel(alerta.nivelActual)">
+                        {{ etiquetaNivel(alerta.nivelActual) }}
+                      </span>
+                    }
+                  </td>
+                  <td class="text-muted small">{{ alerta.motivo }}</td>
+                  <td class="text-end">
+                    <a class="link-primary small" style="cursor: pointer;" (click)="verDetalle(alerta.alumnoId)">
+                      Ver detalle →
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   }
+
+  <div class="card">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Progreso por estudiante</h2>
+      @if (resumen()!.rendimiento.length === 0) {
+        <p class="text-muted small mb-0">Aún no hay alumnos registrados.</p>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Entrada</th>
+                <th>Nivel inicial</th>
+                <th>Nivel actual</th>
+                <th>Avance</th>
+                <th>Último resultado</th>
+                <th>Estado</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (alumno of resumen()!.rendimiento; track alumno.alumnoId) {
+                <tr
+                  tabindex="0"
+                  style="cursor: pointer;"
+                  (click)="verDetalle(alumno.alumnoId)"
+                  (keydown.enter)="verDetalle(alumno.alumnoId)"
+                >
+                  <td>{{ alumno.apellidos }}, {{ alumno.nombres }}</td>
+                  <td>
+                    @if (alumno.puntajeEntrada !== null) {
+                      {{ notaVigesimal(alumno.puntajeEntrada) }}/20
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (alumno.nivelInicial !== null) {
+                      <span class="badge" [class]="claseNivel(alumno.nivelInicial)">
+                        {{ etiquetaNivel(alumno.nivelInicial) }}
+                      </span>
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (alumno.nivelActual !== null) {
+                      <span class="badge" [class]="claseNivel(alumno.nivelActual)">
+                        {{ etiquetaNivel(alumno.nivelActual) }}
+                      </span>
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                  <td>{{ alumno.porcentajeAvance | number: '1.0-0' }}%</td>
+                  <td>
+                    @if (alumno.ultimoPuntaje !== null) {
+                      {{ notaVigesimal(alumno.ultimoPuntaje) }}/20
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="badge" [class]="claseEstado(alumno.estado)">{{ alumno.estado }}</span>
+                  </td>
+                  <td class="text-end text-muted">Ver detalle →</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
 }

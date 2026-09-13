@@ -8,5 +8,8 @@ public record AlumnoResumenDto(
     string Apellidos,
     string Grado,
     int EvaluacionesRealizadas,
-    NivelDesempeno? UltimoNivel,
-    DateTime? UltimaEvaluacion);
+    NivelDesempeno? NivelActual,
+    DateTime? UltimaEvaluacion,
+    double PorcentajeAvance,
+    int? UltimoPuntaje,
+    string Estado);

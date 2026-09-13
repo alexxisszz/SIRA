@@ -1,27 +1,228 @@
-<h1 class="h4 mb-4">Historial de evaluaciones</h1>
+<button type="button" class="btn btn-link ps-0 mb-2" (click)="router.navigate(['/docente/alumnos'])">
+  ← Volver a Mis alumnos
+</button>
 
 @if (cargando()) {
-  <p class="text-muted">Cargando historial...</p>
-} @else if (error()) {
-  <div class="alert alert-danger">No se pudo cargar el historial del alumno.</div>
-} @else if (resultados().length === 0) {
-  <p class="text-muted">Este alumno aún no tiene evaluaciones registradas.</p>
+  <p class="text-muted">Cargando perfil del alumno...</p>
+} @else if (error() || !perfil()) {
+  <div class="alert alert-danger">No se pudo cargar el perfil del alumno.</div>
 } @else {
-  @for (resultado of resultados(); track resultado.evaluacionId) {
-    <div class="card mb-3">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <h2 class="h6 mb-0">{{ resultado.temaNombre }}</h2>
-            <small class="text-muted">{{ resultado.fechaCalculo | date: 'dd/MM/yyyy HH:mm' }}</small>
+  <div class="mb-4">
+    <h1 class="h4 mb-1">{{ perfil()!.nombres }} {{ perfil()!.apellidos }}</h1>
+    <p class="text-muted mb-0">
+      {{ perfil()!.grado }}
+      @if (perfil()!.temaActualNombre) {
+        · Tema actual: {{ perfil()!.temaActualNombre }}
+      }
+      @if (perfil()!.ultimaActividad) {
+        · Última actividad: {{ perfil()!.ultimaActividad | date: 'dd/MM/yyyy' }}
+      }
+    </p>
+    @if (perfil()!.nivelActual !== null) {
+      <span class="badge mt-1" [class]="claseNivel(perfil()!.nivelActual!)">
+        Nivel actual: {{ etiquetaNivel(perfil()!.nivelActual!) }}
+      </span>
+    }
+  </div>
+
+  @if (perfil()!.cantidadEvaluaciones === 0) {
+    <div class="alert alert-secondary">Este alumno todavía no tiene evaluaciones registradas.</div>
+  } @else {
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <p class="h4 mb-0">
+              @if (perfil()!.ultimaNota !== null) {
+                {{ notaVigesimal(perfil()!.ultimaNota!) }}/20
+              } @else {
+                <span class="text-muted fs-6">Sin evaluar</span>
+              }
+            </p>
+            <p class="text-muted small mb-0">Última nota</p>
           </div>
-          <span class="badge" [class]="claseNivel(resultado.nivel)">
-            {{ etiquetaNivel(resultado.nivel) }}
-          </span>
         </div>
-        <p class="mb-1">Nota: <strong>{{ notaVigesimal(resultado.puntaje) }}/20</strong></p>
-        <p class="mb-2 text-muted small">{{ resultado.retroalimentacion }}</p>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <p class="h4 mb-0">
+              @if (perfil()!.nivelActual !== null) {
+                {{ etiquetaNivel(perfil()!.nivelActual!) }}
+              } @else {
+                <span class="text-muted fs-6">Sin nivel</span>
+              }
+            </p>
+            <p class="text-muted small mb-0">Nivel actual</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <p class="h4 mb-0">
+              @if (perfil()!.porcentajeAciertosGlobal !== null) {
+                {{ perfil()!.porcentajeAciertosGlobal! | number: '1.0-0' }}%
+              } @else {
+                <span class="text-muted fs-6">Sin datos</span>
+              }
+            </p>
+            <p class="text-muted small mb-0">Aciertos</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <p class="h4 mb-0">{{ perfil()!.cantidadEvaluaciones }}</p>
+            <p class="text-muted small mb-0">Evaluaciones</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="h6 mb-3">
+          Rendimiento por subtema
+          @if (perfil()!.temaActualNombre) {
+            <span class="text-muted fw-normal">· {{ perfil()!.temaActualNombre }}</span>
+          }
+        </h2>
+        @if (perfil()!.rendimientoPorSubtema.length === 0) {
+          <p class="text-muted small mb-0">Aún no hay suficientes respuestas para calcular el rendimiento por subtema.</p>
+        } @else {
+          @for (subtema of perfil()!.rendimientoPorSubtema; track subtema.subtema) {
+            <div class="mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="small">{{ subtema.subtema }}</span>
+                <span class="d-flex align-items-center gap-2">
+                  <span class="text-muted small">{{ subtema.porcentajeAciertos | number: '1.0-0' }}%</span>
+                  <span class="badge" [class]="claseEstadoSubtema(subtema.estado)">{{ subtema.estado }}</span>
+                </span>
+              </div>
+              <div class="progress" style="height: 0.4rem;">
+                <div class="progress-bar bg-primary" [style.width.%]="subtema.porcentajeAciertos"></div>
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h6 mb-3 text-success">Fortalezas</h2>
+            @if (perfil()!.fortalezas.length === 0) {
+              <p class="text-muted small mb-0">Aún no se identifican fortalezas claras.</p>
+            } @else {
+              <ul class="mb-0 ps-3">
+                @for (fortaleza of perfil()!.fortalezas; track fortaleza) {
+                  <li class="small">{{ fortaleza }}</li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h6 mb-3 text-danger">Necesita reforzar</h2>
+            @if (perfil()!.dificultades.length === 0) {
+              <p class="text-muted small mb-0">No se detectaron dificultades pendientes.</p>
+            } @else {
+              <ul class="mb-0 ps-3">
+                @for (dificultad of perfil()!.dificultades; track dificultad) {
+                  <li class="small">{{ dificultad }}</li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h6 mb-3">Recomendación actual</h2>
+            @if (perfil()!.recomendacionActual) {
+              <p class="small mb-2">{{ perfil()!.recomendacionActual }}</p>
+            } @else {
+              <p class="text-muted small mb-2">Sin recomendación disponible todavía.</p>
+            }
+            @if (perfil()!.nivelInicial !== null) {
+              <p class="text-muted small mb-0">Nivel inicial: {{ etiquetaNivel(perfil()!.nivelInicial!) }}</p>
+            }
+            <p class="text-muted small mb-0">Evolución: {{ perfil()!.evolucion }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Decisiones del sistema</h2>
+        @if (perfil()!.decisionesSistema.length === 0) {
+          <p class="text-muted small mb-0">Aún no hay decisiones adaptativas registradas para este alumno.</p>
+        } @else {
+          @for (decision of perfil()!.decisionesSistema; track decision.reglaAplicada) {
+            <div class="mb-3 pb-3 border-bottom">
+              <p class="mb-1"><strong>Regla aplicada:</strong> {{ decision.reglaAplicada }}</p>
+              <p class="mb-1 small"><strong>Motivo:</strong> {{ decision.motivo }}</p>
+              <p class="mb-0 small"><strong>Acción:</strong> {{ decision.accion }}</p>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Evolución del estudiante</h2>
+        @if (perfil()!.evolucionPuntajes.length < 2) {
+          <p class="text-muted small mb-0">
+            Todavía no existen suficientes evaluaciones para mostrar la evolución del estudiante.
+          </p>
+        } @else {
+          <div class="d-flex align-items-end gap-3" style="height: 8rem;">
+            @for (punto of perfil()!.evolucionPuntajes; track punto.fecha + punto.etiqueta) {
+              <div class="d-flex flex-column align-items-center justify-content-end h-100" style="flex: 1;">
+                <span class="small text-muted mb-1">{{ punto.puntaje }}</span>
+                <div class="bg-primary rounded-top w-100" [style.height.%]="alturaBarra(punto.puntaje, 100)"></div>
+                <span class="small text-muted mt-1 text-center">{{ punto.etiqueta }}</span>
+              </div>
+            }
+          </div>
+        }
       </div>
     </div>
   }
+
+  <div class="card">
+    <div class="card-body">
+      <h2 class="h6 mb-3">Historial de evaluaciones</h2>
+      @if (perfil()!.historial.length === 0) {
+        <p class="text-muted small mb-0">Este alumno aún no tiene evaluaciones registradas.</p>
+      } @else {
+        @for (resultado of perfil()!.historial; track resultado.evaluacionId) {
+          <div class="card mb-2 border-0 border-bottom rounded-0">
+            <div class="card-body py-2">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <div>
+                  <h3 class="h6 mb-0">{{ resultado.temaNombre }}</h3>
+                  <small class="text-muted">{{ resultado.fechaCalculo | date: 'dd/MM/yyyy HH:mm' }}</small>
+                </div>
+                <span class="badge" [class]="claseNivel(resultado.nivel)">
+                  {{ etiquetaNivel(resultado.nivel) }}
+                </span>
+              </div>
+              <p class="mb-0">Nota: <strong>{{ notaVigesimal(resultado.puntaje) }}/20</strong></p>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
 }

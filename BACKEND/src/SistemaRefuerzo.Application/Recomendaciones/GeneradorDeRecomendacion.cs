@@ -19,6 +19,7 @@ public class GeneradorDeRecomendacion
         Tema tema,
         IReadOnlyDictionary<Guid, Pregunta> preguntasDelTema,
         BaseDeHechos hechos,
+        IReadOnlyCollection<string> reglasDisparadas,
         CancellationToken cancellationToken)
     {
         var nivel = hechos.Obtener<NivelDesempeno>(ClavesHechos.NivelAsignado);
@@ -41,7 +42,8 @@ public class GeneradorDeRecomendacion
             nivel,
             ConstruirRetroalimentacion(nivel, requiereRefuerzoTeorico, subtemasConDificultad, subtemasDominados),
             temasPorReforzar,
-            subtemasDominados);
+            subtemasDominados,
+            reglasDisparadas);
 
         var ejerciciosCandidatos = preguntasDelTema.Values.Where(p => p.NivelDificultad == nivel).ToList();
         var subtemasSet = subtemasConDificultad.ToHashSet();

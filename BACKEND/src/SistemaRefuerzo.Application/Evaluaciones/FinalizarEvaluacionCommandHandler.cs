@@ -62,10 +62,12 @@ public class FinalizarEvaluacionCommandHandler(
 
         // 3. El MOTOR DE INFERENCIA evalúa los hechos contra las reglas (nivel, refuerzo teórico
         //    y análisis de subtemas dominados/con dificultad) y deja conclusiones en la base de hechos.
-        new MotorInferencia().Ejecutar(hechos, reglasEjecutables);
+        var reglasDisparadas = new MotorInferencia().Ejecutar(hechos, reglasEjecutables);
 
-        // 4. Las conclusiones se traducen en una recomendación concreta para el alumno.
-        var recomendacion = await generadorDeRecomendacion.GenerarAsync(resultado, tema, preguntasDelTema, hechos, cancellationToken);
+        // 4. Las conclusiones se traducen en una recomendación concreta para el alumno,
+        //    guardando también qué reglas dispararon (trazabilidad para el panel docente).
+        var recomendacion = await generadorDeRecomendacion.GenerarAsync(
+            resultado, tema, preguntasDelTema, hechos, reglasDisparadas, cancellationToken);
         recomendacionRepository.Agregar(recomendacion);
 
         await unitOfWork.GuardarCambiosAsync(cancellationToken);

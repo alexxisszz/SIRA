@@ -1,31 +1,32 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DocenteService } from '../services/docente.service';
-import { ResultadoHistorico } from '../models/docente.model';
+import { EstadoSubtema, PerfilAlumno } from '../models/docente.model';
 import { NivelDesempeno } from '../../alumno/models/recomendacion.model';
-import { CLASE_NIVEL, ETIQUETA_NIVEL } from '../../../shared/utils/nivel.util';
+import { CLASE_ESTADO_SUBTEMA, CLASE_NIVEL, ETIQUETA_NIVEL } from '../../../shared/utils/nivel.util';
 import { convertirAVigesimal } from '../../../shared/utils/calificacion.util';
 
 @Component({
   selector: 'app-alumno-detalle',
-  imports: [DatePipe],
+  imports: [DatePipe, DecimalPipe],
   templateUrl: './alumno-detalle.html',
 })
 export class AlumnoDetalle {
   private readonly route = inject(ActivatedRoute);
   private readonly docenteService = inject(DocenteService);
+  protected readonly router = inject(Router);
 
-  protected readonly resultados = signal<ResultadoHistorico[]>([]);
+  protected readonly perfil = signal<PerfilAlumno | null>(null);
   protected readonly cargando = signal(true);
   protected readonly error = signal(false);
 
   constructor() {
     const alumnoId = this.route.snapshot.paramMap.get('alumnoId')!;
 
-    this.docenteService.obtenerResultadosPorAlumno(alumnoId).subscribe({
-      next: (resultados) => {
-        this.resultados.set(resultados);
+    this.docenteService.obtenerPerfilAlumno(alumnoId).subscribe({
+      next: (perfil) => {
+        this.perfil.set(perfil);
         this.cargando.set(false);
       },
       error: () => {
@@ -43,7 +44,16 @@ export class AlumnoDetalle {
     return CLASE_NIVEL[nivel];
   }
 
+  claseEstadoSubtema(estado: EstadoSubtema): string {
+    return CLASE_ESTADO_SUBTEMA[estado];
+  }
+
   notaVigesimal(puntaje: number): number {
     return convertirAVigesimal(puntaje);
+  }
+
+  /** Escala 0-100 -> altura relativa (%) para las barras del gráfico de evolución. */
+  alturaBarra(puntaje: number, maximo: number): number {
+    return maximo > 0 ? Math.max((puntaje / maximo) * 100, 4) : 4;
   }
 }

@@ -11,6 +11,8 @@ $icono-ancho: 1.15rem;
   flex-shrink: 0;
   background: linear-gradient(180deg, var(--sira-azul-medio), var(--sira-azul-oscuro));
   overflow: hidden;
+  transition: width 0.2s ease;
+  z-index: 10;
 }
 
 .dashboard-sidebar__header {
@@ -85,5 +87,32 @@ $icono-ancho: 1.15rem;
 
   .dashboard-sidebar__link {
     min-height: 3.2rem;
+  }
+}
+
+// Solo en dispositivos con mouse: el touch no tiene hover real y el sidebar quedaría
+// expandido "pegado" tras un tap, así que ahí se mantiene siempre angosto.
+@media (hover: hover) and (pointer: fine) {
+  .dashboard-sidebar:hover {
+    width: 14rem;
+  }
+
+  .dashboard-sidebar:hover .dashboard-sidebar__header {
+    justify-content: flex-start;
+    gap: 0.6rem;
+  }
+
+  .dashboard-sidebar:hover .dashboard-sidebar__marca {
+    display: block;
+  }
+
+  .dashboard-sidebar:hover .dashboard-sidebar__link {
+    justify-content: flex-start;
+    gap: 0.75rem;
+  }
+
+  .dashboard-sidebar:hover .dashboard-sidebar__link span {
+    display: inline;
+    white-space: nowrap;
   }
 }
