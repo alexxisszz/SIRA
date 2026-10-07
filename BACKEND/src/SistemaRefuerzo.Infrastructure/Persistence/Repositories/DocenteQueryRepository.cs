@@ -18,7 +18,10 @@ public class DocenteQueryRepository(AppDbContext dbContext) : IDocenteQueryRepos
 {
     public async Task<List<AlumnoResumenDto>> ObtenerResumenAlumnosAsync(Guid? temaId, CancellationToken cancellationToken)
     {
-        var alumnos = await dbContext.Alumnos.AsNoTracking().ToListAsync(cancellationToken);
+        // Solo cuentas activas: las desactivadas no cuentan como alumnos del docente.
+        var alumnos = await dbContext.Alumnos.AsNoTracking()
+            .Where(a => dbContext.Usuarios.Any(u => u.Id == a.UsuarioId && u.Activo))
+            .ToListAsync(cancellationToken);
         var evaluaciones = await ObtenerEvaluacionesFinalizadasAsync(cancellationToken);
         var resultados = await dbContext.Resultados.AsNoTracking().ToListAsync(cancellationToken);
         var recomendaciones = await dbContext.Recomendaciones.AsNoTracking().ToListAsync(cancellationToken);
@@ -111,7 +114,10 @@ public class DocenteQueryRepository(AppDbContext dbContext) : IDocenteQueryRepos
 
     public async Task<ResumenGrupoDto> ObtenerResumenGrupoAsync(Guid? temaId, CancellationToken cancellationToken)
     {
-        var alumnos = await dbContext.Alumnos.AsNoTracking().ToListAsync(cancellationToken);
+        // Solo cuentas activas: las desactivadas no cuentan como alumnos del docente.
+        var alumnos = await dbContext.Alumnos.AsNoTracking()
+            .Where(a => dbContext.Usuarios.Any(u => u.Id == a.UsuarioId && u.Activo))
+            .ToListAsync(cancellationToken);
         var evaluaciones = await ObtenerEvaluacionesFinalizadasAsync(cancellationToken);
         var resultados = await dbContext.Resultados.AsNoTracking().ToListAsync(cancellationToken);
         var recomendaciones = await dbContext.Recomendaciones.AsNoTracking().ToListAsync(cancellationToken);

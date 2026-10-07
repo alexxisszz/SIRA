@@ -10,7 +10,9 @@ public class AlumnoRepository(AppDbContext dbContext) : IAlumnoRepository
         dbContext.Alumnos.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
     public Task<List<Alumno>> ListarAsync(CancellationToken cancellationToken) =>
-        dbContext.Alumnos.AsNoTracking().ToListAsync(cancellationToken);
+        dbContext.Alumnos.AsNoTracking()
+            .Where(a => dbContext.Usuarios.Any(u => u.Id == a.UsuarioId && u.Activo))
+            .ToListAsync(cancellationToken);
 
     public void Agregar(Alumno alumno) => dbContext.Alumnos.Add(alumno);
 }
