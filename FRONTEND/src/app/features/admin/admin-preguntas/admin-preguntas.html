@@ -22,9 +22,18 @@
           <div class="col-md-6 mb-3">
             <label class="form-label small">Nivel de dificultad</label>
             <select class="form-select" formControlName="nivelDificultad">
-              <option [value]="NivelDificultad.Basico">Básico</option>
-              <option [value]="NivelDificultad.Intermedio">Intermedio</option>
-              <option [value]="NivelDificultad.Avanzado">Avanzado</option>
+              <option [ngValue]="NivelDificultad.Basico">Básico</option>
+              <option [ngValue]="NivelDificultad.Intermedio">Intermedio</option>
+              <option [ngValue]="NivelDificultad.Avanzado">Avanzado</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label small">Indicador cognitivo (D1)</label>
+            <select class="form-select" formControlName="indicador">
+              <option [ngValue]="IndicadorCognitivo.I1">{{ etiquetaIndicador[IndicadorCognitivo.I1] }}</option>
+              <option [ngValue]="IndicadorCognitivo.I2">{{ etiquetaIndicador[IndicadorCognitivo.I2] }}</option>
+              <option [ngValue]="IndicadorCognitivo.I3">{{ etiquetaIndicador[IndicadorCognitivo.I3] }}</option>
             </select>
           </div>
 
@@ -94,6 +103,9 @@
           <div class="d-flex gap-1">
             <span class="badge text-bg-secondary">{{ pregunta.subtema }}</span>
             <span class="badge text-bg-secondary">{{ etiquetaNivel[pregunta.nivelDificultad] }}</span>
+            <span class="badge text-bg-info" [title]="etiquetaIndicador[pregunta.indicador]">
+              {{ IndicadorCognitivo[pregunta.indicador] }}
+            </span>
             <span class="badge text-bg-light border">{{ pregunta.puntaje }} pt</span>
           </div>
         </div>

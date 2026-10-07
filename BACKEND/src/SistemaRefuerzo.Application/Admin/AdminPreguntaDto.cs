@@ -10,6 +10,7 @@ public record AdminPreguntaDto(
     string Enunciado,
     string Subtema,
     NivelDesempeno NivelDificultad,
+    IndicadorCognitivo Indicador,
     TipoPregunta Tipo,
     string? Explicacion,
     int Puntaje,

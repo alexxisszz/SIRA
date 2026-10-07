@@ -127,3 +127,49 @@ export interface PerfilAlumno {
   evolucionPuntajes: PuntoEvolucion[];
   historial: ResultadoHistorico[];
 }
+
+export type TipoEvaluacionFicha = 'Pretest' | 'Postest';
+
+/**
+ * El backend serializa enums como número (sin JsonStringEnumConverter), así que el
+ * body del POST debe enviar el valor numérico de TipoEvaluacion (Pretest=3, Postest=4).
+ * El GET sí acepta el nombre como query string (ASP.NET model binding lo soporta).
+ */
+export const TIPO_EVALUACION_FICHA_VALOR: Record<TipoEvaluacionFicha, number> = {
+  Pretest: 3,
+  Postest: 4,
+};
+
+/**
+ * Fila de la ficha de registro de notas (escala vigesimal 0-20).
+ * D1 (Cognitiva) la calcula el sistema; D2 (Procedimental) y D3 (Actitudinal) las registra el docente.
+ */
+export interface FichaRegistroNota {
+  alumnoId: string;
+  nombresApellidos: string;
+  d1I1: number;
+  d1I2: number;
+  d1I3: number;
+  d1Promedio: number;
+  d2I1: number;
+  d2I2: number;
+  d2I3: number;
+  d2Promedio: number;
+  d3I1: number;
+  d3I2: number;
+  d3I3: number;
+  d3Promedio: number;
+  promedioFinal: number;
+}
+
+export interface GuardarNotasDocenteRequest {
+  alumnoId: string;
+  temaId: string;
+  tipoEvaluacion: number;
+  d2I1: number;
+  d2I2: number;
+  d2I3: number;
+  d3I1: number;
+  d3I2: number;
+  d3I3: number;
+}

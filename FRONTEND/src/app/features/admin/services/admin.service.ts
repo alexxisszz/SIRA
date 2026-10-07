@@ -10,6 +10,7 @@ import {
   AdminRegla,
   AdminTema,
   AdminVideoApoyo,
+  IndicadorCognitivo,
   NivelDificultad,
   TipoContenidoTeorico,
   TipoPregunta,
@@ -82,6 +83,7 @@ export class AdminService {
     enunciado: string;
     subtema: string;
     nivelDificultad: NivelDificultad;
+    indicador: IndicadorCognitivo;
     tipo: TipoPregunta;
     explicacion: string | null;
     puntaje: number;
@@ -96,6 +98,7 @@ export class AdminService {
       enunciado: string;
       subtema: string;
       nivelDificultad: NivelDificultad;
+      indicador: IndicadorCognitivo;
       tipo: TipoPregunta;
       explicacion: string | null;
       puntaje: number;

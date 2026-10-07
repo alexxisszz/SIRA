@@ -24,7 +24,8 @@ public class CrearPreguntaCommandHandler(
             request.Subtema,
             request.Tipo,
             request.Explicacion,
-            request.Puntaje);
+            request.Puntaje,
+            request.Indicador);
 
         foreach (var opcion in request.Opciones)
             pregunta.AgregarOpcion(opcion.Texto, opcion.EsCorrecta);

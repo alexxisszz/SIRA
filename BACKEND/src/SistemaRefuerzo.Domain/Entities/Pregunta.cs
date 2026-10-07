@@ -14,6 +14,7 @@ public class Pregunta
     public TipoPregunta Tipo { get; private set; }
     public string? Explicacion { get; private set; }
     public int Puntaje { get; private set; }
+    public IndicadorCognitivo Indicador { get; private set; } = IndicadorCognitivo.I1;
     public IReadOnlyCollection<OpcionPregunta> Opciones => _opciones.AsReadOnly();
 
     private Pregunta() { }
@@ -25,7 +26,8 @@ public class Pregunta
         string subtema,
         TipoPregunta tipo = TipoPregunta.OpcionMultiple,
         string? explicacion = null,
-        int puntaje = 1)
+        int puntaje = 1,
+        IndicadorCognitivo indicador = IndicadorCognitivo.I1)
     {
         Id = Guid.NewGuid();
         TemaId = temaId;
@@ -35,7 +37,10 @@ public class Pregunta
         Tipo = tipo;
         Explicacion = explicacion;
         Puntaje = puntaje;
+        Indicador = indicador;
     }
+
+    public void AsignarIndicador(IndicadorCognitivo indicador) => Indicador = indicador;
 
     public void AgregarOpcion(string texto, bool esCorrecta)
     {

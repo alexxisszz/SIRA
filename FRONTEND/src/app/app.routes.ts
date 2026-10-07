@@ -59,6 +59,11 @@ export const routes: Routes = [
           import('./features/docente/alumno-detalle/alumno-detalle').then((m) => m.AlumnoDetalle),
       },
       {
+        path: 'docente/ficha-notas',
+        canActivate: [roleGuard([Rol.Docente])],
+        loadComponent: () => import('./features/docente/ficha-notas/ficha-notas').then((m) => m.FichaNotas),
+      },
+      {
         path: 'docente/estadisticas',
         canActivate: [roleGuard([Rol.Docente])],
         loadComponent: () => import('./features/docente/estadisticas/estadisticas').then((m) => m.Estadisticas),

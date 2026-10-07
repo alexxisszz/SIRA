@@ -16,6 +16,7 @@ public class PreguntaConfiguration : IEntityTypeConfiguration<Pregunta>
         builder.Property(p => p.Tipo).HasConversion<string>().HasMaxLength(30);
         builder.Property(p => p.Explicacion).HasMaxLength(1000);
         builder.Property(p => p.Puntaje).IsRequired();
+        builder.Property(p => p.Indicador).HasConversion<string>().HasMaxLength(5);
         builder.HasIndex(p => p.TemaId);
         builder.HasIndex(p => new { p.TemaId, p.Subtema });
 

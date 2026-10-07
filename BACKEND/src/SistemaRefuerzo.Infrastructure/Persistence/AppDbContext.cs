@@ -20,6 +20,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<VideoApoyo> VideosApoyo => Set<VideoApoyo>();
     public DbSet<IntentoEjercicio> IntentosEjercicio => Set<IntentoEjercicio>();
     public DbSet<ContenidoTeorico> ContenidosTeoricos => Set<ContenidoTeorico>();
+    public DbSet<FichaRegistroNota> FichasRegistroNotas => Set<FichaRegistroNota>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

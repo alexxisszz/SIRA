@@ -405,6 +405,8 @@ public class DocenteQueryRepository(AppDbContext dbContext) : IDocenteQueryRepos
         {
             TipoEvaluacion.Diagnostica => "Prueba de entrada",
             TipoEvaluacion.Final => "Prueba final",
+            TipoEvaluacion.Pretest => "Pretest",
+            TipoEvaluacion.Postest => "Postest",
             _ => evaluacion.NivelEvaluado is NivelDesempeno nivel ? $"Nivel {nivel}" : "Evaluación",
         };
         return $"{tipo} · {temaNombre}";

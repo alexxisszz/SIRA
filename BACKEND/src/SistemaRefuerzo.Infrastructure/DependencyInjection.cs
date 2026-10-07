@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<IIntentoEjercicioRepository, IntentoEjercicioRepository>();
         services.AddScoped<IPracticaQueryRepository, PracticaQueryRepository>();
         services.AddScoped<IContenidoTeoricoRepository, ContenidoTeoricoRepository>();
+        services.AddScoped<IFichaRegistroNotaRepository, FichaRegistroNotaRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();

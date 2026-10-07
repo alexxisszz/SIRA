@@ -4,7 +4,13 @@ import { FormArray, FormBuilder, FormControl, ReactiveFormsModule, Validators } 
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AdminService } from '../services/admin.service';
-import { AdminPregunta, NivelDificultad, TipoPregunta } from '../models/admin.model';
+import { AdminPregunta, IndicadorCognitivo, NivelDificultad, TipoPregunta } from '../models/admin.model';
+
+const ETIQUETA_INDICADOR: Record<IndicadorCognitivo, string> = {
+  [IndicadorCognitivo.I1]: 'I1 - Comprensión de contenidos teóricos',
+  [IndicadorCognitivo.I2]: 'I2 - Retención de información académica',
+  [IndicadorCognitivo.I3]: 'I3 - Adquisición de habilidades',
+};
 
 const ETIQUETA_NIVEL: Record<NivelDificultad, string> = {
   [NivelDificultad.Basico]: 'Básico',
@@ -30,7 +36,9 @@ export class AdminPreguntas {
 
   protected readonly NivelDificultad = NivelDificultad;
   protected readonly TipoPregunta = TipoPregunta;
+  protected readonly IndicadorCognitivo = IndicadorCognitivo;
   protected readonly etiquetaNivel = ETIQUETA_NIVEL;
+  protected readonly etiquetaIndicador = ETIQUETA_INDICADOR;
   protected readonly etiquetaTipo = ETIQUETA_TIPO;
 
   protected readonly preguntas = signal<AdminPregunta[]>([]);
@@ -44,6 +52,7 @@ export class AdminPreguntas {
     enunciado: ['', Validators.required],
     subtema: ['', Validators.required],
     nivelDificultad: [NivelDificultad.Basico, Validators.required],
+    indicador: [IndicadorCognitivo.I1, Validators.required],
     tipo: [TipoPregunta.OpcionMultiple, Validators.required],
     explicacion: [''],
     puntaje: [1, [Validators.required, Validators.min(1)]],
@@ -99,6 +108,7 @@ export class AdminPreguntas {
       enunciado: '',
       subtema: '',
       nivelDificultad: NivelDificultad.Basico,
+      indicador: IndicadorCognitivo.I1,
       tipo: TipoPregunta.OpcionMultiple,
       explicacion: '',
       puntaje: 1,
@@ -116,6 +126,7 @@ export class AdminPreguntas {
       enunciado: pregunta.enunciado,
       subtema: pregunta.subtema,
       nivelDificultad: pregunta.nivelDificultad,
+      indicador: pregunta.indicador,
       tipo: pregunta.tipo,
       explicacion: pregunta.explicacion ?? '',
       puntaje: pregunta.puntaje,
@@ -142,6 +153,7 @@ export class AdminPreguntas {
       enunciado: valores.enunciado,
       subtema: valores.subtema,
       nivelDificultad: valores.nivelDificultad,
+      indicador: valores.indicador,
       tipo: valores.tipo,
       explicacion: valores.explicacion || null,
       puntaje: valores.puntaje,

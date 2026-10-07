@@ -8,6 +8,7 @@ public record ActualizarPreguntaCommand(
     string Enunciado,
     string Subtema,
     NivelDesempeno NivelDificultad,
+    IndicadorCognitivo Indicador,
     TipoPregunta Tipo,
     string? Explicacion,
     int Puntaje,

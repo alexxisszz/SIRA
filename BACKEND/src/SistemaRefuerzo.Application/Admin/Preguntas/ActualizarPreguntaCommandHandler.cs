@@ -24,6 +24,7 @@ public class ActualizarPreguntaCommandHandler(
             request.Explicacion,
             request.Puntaje,
             request.Opciones.Select(o => (o.Texto, o.EsCorrecta)));
+        pregunta.AsignarIndicador(request.Indicador);
 
         await unitOfWork.GuardarCambiosAsync(cancellationToken);
     }

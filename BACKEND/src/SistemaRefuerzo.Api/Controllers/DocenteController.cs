@@ -2,8 +2,20 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SistemaRefuerzo.Application.Reportes.Docente;
+using SistemaRefuerzo.Domain.Enums;
 
 namespace SistemaRefuerzo.Api.Controllers;
+
+public record RegistrarNotasDocenteRequest(
+    Guid AlumnoId,
+    Guid TemaId,
+    TipoEvaluacion TipoEvaluacion,
+    decimal D2I1,
+    decimal D2I2,
+    decimal D2I3,
+    decimal D3I1,
+    decimal D3I2,
+    decimal D3I3);
 
 [ApiController]
 [Authorize(Roles = "Docente,Administrador")]
@@ -45,5 +57,26 @@ public class DocenteController(ISender sender) : ControllerBase
     {
         var perfil = await sender.Send(new ObtenerPerfilAlumnoQuery(alumnoId), cancellationToken);
         return Ok(perfil);
+    }
+
+    [HttpGet("fichas-notas")]
+    public async Task<ActionResult<FichaRegistroNotasDto>> ObtenerFichaRegistroNotas(
+        [FromQuery] Guid temaId, [FromQuery] TipoEvaluacion tipo, CancellationToken cancellationToken)
+    {
+        var ficha = await sender.Send(new ObtenerFichaRegistroNotasQuery(temaId, tipo), cancellationToken);
+        return Ok(ficha);
+    }
+
+    [HttpPost("fichas-notas/notas-manuales")]
+    public async Task<IActionResult> RegistrarNotasManuales(RegistrarNotasDocenteRequest request, CancellationToken cancellationToken)
+    {
+        await sender.Send(
+            new RegistrarNotasDocenteCommand(
+                request.AlumnoId, request.TemaId, request.TipoEvaluacion,
+                request.D2I1, request.D2I2, request.D2I3,
+                request.D3I1, request.D3I2, request.D3I3),
+            cancellationToken);
+
+        return NoContent();
     }
 }

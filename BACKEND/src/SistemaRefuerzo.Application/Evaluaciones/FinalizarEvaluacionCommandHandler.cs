@@ -3,6 +3,7 @@ using SistemaRefuerzo.Application.Common.Exceptions;
 using SistemaRefuerzo.Application.Common.Interfaces;
 using SistemaRefuerzo.Application.Recomendaciones;
 using SistemaRefuerzo.Domain.Entities;
+using SistemaRefuerzo.Domain.Enums;
 using SistemaRefuerzo.Domain.InferenceEngine;
 
 namespace SistemaRefuerzo.Application.Evaluaciones;
@@ -15,6 +16,7 @@ public class FinalizarEvaluacionCommandHandler(
     IResultadoRepository resultadoRepository,
     IReglaRepository reglaRepository,
     IRecomendacionRepository recomendacionRepository,
+    IFichaRegistroNotaRepository fichaRegistroNotaRepository,
     GeneradorDeRecomendacion generadorDeRecomendacion,
     IUnitOfWork unitOfWork) : IRequestHandler<FinalizarEvaluacionCommand, Guid>
 {
@@ -51,6 +53,9 @@ public class FinalizarEvaluacionCommandHandler(
 
         var desempenoPorSubtema = CalculadoraDesempenoPorSubtema.Calcular(evaluacion.Respuestas, preguntasDelTema);
 
+        if (TipoFichaDe(evaluacion.Tipo) is TipoEvaluacion tipoFicha)
+            await RegistrarDimensionCognitivaAsync(evaluacion, tipoFicha, preguntasDelTema, cancellationToken);
+
         var hechos = new BaseDeHechos();
         hechos.Establecer(ClavesHechos.Puntaje, resultado.Puntaje);
         hechos.Establecer(ClavesHechos.FallosConsecutivos, resultado.FallosConsecutivos);
@@ -73,5 +78,44 @@ public class FinalizarEvaluacionCommandHandler(
         await unitOfWork.GuardarCambiosAsync(cancellationToken);
 
         return recomendacion.Id;
+    }
+
+    /// <summary>
+    /// La prueba de entrada (diagnóstica) es el Pretest y la prueba final del tema es el Postest.
+    /// Las demás evaluaciones (por nivel) no alimentan la ficha.
+    /// </summary>
+    private static TipoEvaluacion? TipoFichaDe(TipoEvaluacion tipo) => tipo switch
+    {
+        TipoEvaluacion.Diagnostica or TipoEvaluacion.Pretest => TipoEvaluacion.Pretest,
+        TipoEvaluacion.Final or TipoEvaluacion.Postest => TipoEvaluacion.Postest,
+        _ => null,
+    };
+
+    /// <summary>
+    /// En las evaluaciones que alimentan la ficha (entrada = Pretest, final = Postest), la dimensión Cognitiva (D1) de la Ficha de Registro de Notas
+    /// se obtiene del % de aciertos por indicador (I1, I2, I3) de las preguntas respondidas.
+    /// </summary>
+    private async Task RegistrarDimensionCognitivaAsync(
+        Evaluacion evaluacion, TipoEvaluacion tipoFicha,
+        IReadOnlyDictionary<Guid, Pregunta> preguntasDelTema, CancellationToken cancellationToken)
+    {
+        var notasPorIndicador = CalculadoraDesempenoPorIndicador.Calcular(evaluacion.Respuestas, preguntasDelTema);
+
+        var ficha = await fichaRegistroNotaRepository.ObtenerAsync(
+                evaluacion.AlumnoId, evaluacion.TemaId, tipoFicha, cancellationToken);
+
+        // La ficha registra solo el primer intento (entrada y final); los reintentos no la modifican.
+        // La fila puede existir antes por las notas D2/D3 del docente, por eso se revisa D1.
+        if (ficha?.TieneD1 == true)
+            return;
+
+        ficha ??= FichaRegistroNota.Crear(evaluacion.AlumnoId, evaluacion.TemaId, tipoFicha);
+
+        ficha.ActualizarD1(
+            notasPorIndicador[IndicadorCognitivo.I1],
+            notasPorIndicador[IndicadorCognitivo.I2],
+            notasPorIndicador[IndicadorCognitivo.I3]);
+
+        await fichaRegistroNotaRepository.GuardarAsync(ficha, cancellationToken);
     }
 }

@@ -14,8 +14,9 @@ public class IniciarEvaluacionCommandHandler(
     ProgresoTemaService progresoTemaService,
     IUnitOfWork unitOfWork) : IRequestHandler<IniciarEvaluacionCommand, Guid>
 {
-    private static readonly TimeSpan TiempoEsperaEntreIntentos = TimeSpan.FromHours(24);
+    private static readonly TimeSpan TiempoEsperaEntreIntentos = TimeSpan.Zero;
     private const int CantidadPreguntasPorEvaluacion = 10;
+    private const int PreguntasPorIndicadorEnPruebaDeFicha = 5;
 
     public async Task<Guid> Handle(IniciarEvaluacionCommand request, CancellationToken cancellationToken)
     {
@@ -47,10 +48,14 @@ public class IniciarEvaluacionCommandHandler(
             ? await preguntaRepository.ObtenerPorTemaYNivelAsync(tema.Id, nivelPool, cancellationToken)
             : await preguntaRepository.ObtenerPorTemaAsync(tema.Id, cancellationToken);
 
-        var preguntasAsignadas = preguntasDisponibles
-            .OrderBy(_ => Guid.NewGuid())
-            .Take(CantidadPreguntasPorEvaluacion)
-            .Select(p => p.Id);
+        // La prueba de entrada y la final alimentan la ficha (D1): se toman las mismas preguntas
+        // por indicador (I1, I2, I3) para que cada nota se calcule sobre igual cantidad de ítems.
+        var preguntasAsignadas = request.Nivel is null && AlimentaFicha(request.Tipo)
+            ? SeleccionarBalanceadasPorIndicador(preguntasDisponibles)
+            : preguntasDisponibles
+                .OrderBy(_ => Guid.NewGuid())
+                .Take(CantidadPreguntasPorEvaluacion)
+                .Select(p => p.Id);
 
         var evaluacion = new Evaluacion(tema.Id, alumno.Id, request.Tipo, preguntasAsignadas, request.Nivel);
 
@@ -59,6 +64,16 @@ public class IniciarEvaluacionCommandHandler(
 
         return evaluacion.Id;
     }
+
+    private static bool AlimentaFicha(TipoEvaluacion tipo) =>
+        tipo is TipoEvaluacion.Diagnostica or TipoEvaluacion.Final;
+
+    private static IEnumerable<Guid> SeleccionarBalanceadasPorIndicador(IEnumerable<Pregunta> preguntas) =>
+        preguntas
+            .GroupBy(p => p.Indicador)
+            .SelectMany(g => g.OrderBy(_ => Guid.NewGuid()).Take(PreguntasPorIndicadorEnPruebaDeFicha))
+            .OrderBy(_ => Guid.NewGuid())
+            .Select(p => p.Id);
 
     private async Task ValidarRequisitoPrevioAsync(IniciarEvaluacionCommand request, Guid alumnoId, CancellationToken cancellationToken)
     {

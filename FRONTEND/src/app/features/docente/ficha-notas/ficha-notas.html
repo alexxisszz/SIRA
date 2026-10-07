@@ -1,0 +1,112 @@
+<section class="ficha-page__heading">
+  <div>
+    <h1>Ficha de registro de notas</h1>
+    <p>Registra las notas procedimentales y actitudinales de tus estudiantes @if (temaSeleccionadoNombre()) { en {{ temaSeleccionadoNombre() }} }</p>
+  </div>
+  @if (temas().length > 0) {
+    <select class="ficha-page__topic-select" aria-label="Seleccionar tema" [ngModel]="temaSeleccionadoId()" (ngModelChange)="cambiarTema($event)">
+      @for (tema of temas(); track tema.id) { <option [value]="tema.id">{{ tema.nombre }}</option> }
+    </select>
+  }
+</section>
+
+<div class="ficha-page__toolbar">
+  <div class="ficha-tabs" role="tablist" aria-label="Tipo de evaluacion">
+    @for (tipo of tipos; track tipo) {
+      <button type="button" role="tab" [attr.aria-selected]="tipoSeleccionado() === tipo" [class.active]="tipoSeleccionado() === tipo" (click)="cambiarTipo(tipo)">{{ tipo }}</button>
+    }
+  </div>
+  <p class="ficha-page__legend"><i class="bi bi-info-circle"></i> D1 se calcula automaticamente. Ingresa D2 y D3 en escala de {{ notaMinima }} a {{ notaMaxima }}.</p>
+</div>
+
+@if (cargando()) { <p class="text-muted">Cargando ficha de notas...</p> }
+@else if (error()) { <div class="alert alert-danger">No se pudo cargar la ficha de registro de notas.</div> }
+@else if (temas().length === 0) { <p class="text-muted ficha-empty">No hay temas disponibles.</p> }
+@else if (filas().length === 0) { <p class="text-muted ficha-empty">No hay alumnos registrados para este tema.</p> }
+@else {
+  @if (mensajeGuardado()) { <div class="alert alert-success py-2">{{ mensajeGuardado() }}</div> }
+  @if (errorGuardado()) { <div class="alert alert-danger py-2">{{ errorGuardado() }}</div> }
+
+  <section class="ficha-table-card">
+    <div class="ficha-leyenda">
+      @for (dim of dimensiones; track dim.clave) {
+        <div class="ficha-leyenda__dim">
+          <strong>{{ dim.clave }} · {{ dim.nombre }}</strong>
+          <ul>
+            @for (nombre of dim.indicadores; track nombre; let n = $index) {
+              <li><span>I{{ n + 1 }}</span> {{ nombre }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+    <div class="table-responsive">
+      <table class="table align-middle ficha-table">
+        <thead>
+          <tr>
+            <th rowspan="2" class="ficha-table__num">N°</th>
+            <th rowspan="2" class="ficha-table__alumno">Apellidos y nombres</th>
+            <th colspan="4" class="ficha-table__dim ficha-table__dim--d1">D1 · Cognitiva</th>
+            <th colspan="4" class="ficha-table__dim ficha-table__dim--d2">D2 · Procedimental</th>
+            <th colspan="4" class="ficha-table__dim ficha-table__dim--d3">D3 · Actitudinal</th>
+            <th rowspan="2" class="ficha-table__final">Promedio final</th>
+          </tr>
+          <tr>
+            @for (dim of dimensiones; track dim.clave) {
+              @for (nombre of dim.indicadores; track nombre; let n = $index) {
+                <th [attr.title]="nombre" class="ficha-table__ind">I{{ n + 1 }}</th>
+              }
+              <th class="ficha-table__prom">Prom.</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.base.alumnoId; let i = $index) {
+            <tr [class.ficha-table__row--modificada]="fila.modificada" [class.ficha-table__row--error]="fila.errorGuardado">
+              <td class="ficha-table__num">{{ i + 1 }}</td>
+              <td class="ficha-table__alumno"><strong>{{ fila.base.nombresApellidos }}</strong></td>
+
+              <td>{{ mostrarNota(fila.base.d1I1) }}</td>
+              <td>{{ mostrarNota(fila.base.d1I2) }}</td>
+              <td>{{ mostrarNota(fila.base.d1I3) }}</td>
+              <td class="ficha-table__prom">{{ mostrarNota(fila.base.d1Promedio) }}</td>
+
+              @for (idx of indicadores; track idx) {
+                <td>
+                  <input type="number" class="ficha-input" [class.is-invalid]="!notaValida(fila.d2[idx])" [min]="notaMinima" [max]="notaMaxima" step="0.5"
+                    [attr.aria-label]="'D2 indicador ' + (idx + 1) + ' de ' + fila.base.nombresApellidos"
+                    [ngModel]="fila.d2[idx]" (ngModelChange)="actualizarNota(fila.base.alumnoId, 'd2', idx, $event)" />
+                </td>
+              }
+              <td class="ficha-table__prom">{{ mostrarNota(promedio(fila.d2)) }}</td>
+
+              @for (idx of indicadores; track idx) {
+                <td>
+                  <input type="number" class="ficha-input" [class.is-invalid]="!notaValida(fila.d3[idx])" [min]="notaMinima" [max]="notaMaxima" step="0.5"
+                    [attr.aria-label]="'D3 indicador ' + (idx + 1) + ' de ' + fila.base.nombresApellidos"
+                    [ngModel]="fila.d3[idx]" (ngModelChange)="actualizarNota(fila.base.alumnoId, 'd3', idx, $event)" />
+                </td>
+              }
+              <td class="ficha-table__prom">{{ mostrarNota(promedio(fila.d3)) }}</td>
+
+              <td class="ficha-table__final">{{ mostrarNota(promedioFinal(fila)) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <footer class="ficha-table__footer">
+      <span>
+        {{ filas().length }} estudiantes · {{ tipoSeleccionado() }}
+        @if (filasModificadas().length > 0) { · <strong>{{ filasModificadas().length }} con cambios sin guardar</strong> }
+        @if (hayNotasInvalidas()) { <span class="ficha-table__warning"> · Hay notas vacias o fuera del rango {{ notaMinima }}-{{ notaMaxima }}</span> }
+      </span>
+      <div class="ficha-actions">
+        <button type="button" class="ficha-button ficha-button--secondary" [disabled]="filasModificadas().length === 0 || guardando()" (click)="descartarCambios()">Descartar</button>
+        <button type="button" class="ficha-button ficha-button--primary" [disabled]="!puedeGuardar()" (click)="guardarCambios()">
+          @if (guardando()) { Guardando... } @else { <i class="bi bi-save"></i> Guardar cambios }
+        </button>
+      </div>
+    </footer>
+  </section>
+}

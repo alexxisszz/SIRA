@@ -17,6 +17,7 @@ public class ObtenerPreguntasAdminQueryHandler(IPreguntaRepository preguntaRepos
                 p.Enunciado,
                 p.Subtema,
                 p.NivelDificultad,
+                p.Indicador,
                 p.Tipo,
                 p.Explicacion,
                 p.Puntaje,

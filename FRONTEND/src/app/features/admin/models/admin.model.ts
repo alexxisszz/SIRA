@@ -35,6 +35,12 @@ export enum NivelDificultad {
   Avanzado = 2,
 }
 
+export enum IndicadorCognitivo {
+  I1 = 0,
+  I2 = 1,
+  I3 = 2,
+}
+
 export enum TipoPregunta {
   OpcionMultiple = 0,
 }
@@ -45,6 +51,7 @@ export interface AdminPregunta {
   enunciado: string;
   subtema: string;
   nivelDificultad: NivelDificultad;
+  indicador: IndicadorCognitivo;
   tipo: TipoPregunta;
   explicacion: string | null;
   puntaje: number;
